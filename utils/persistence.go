@@ -1,0 +1,54 @@
+package utils
+
+import (
+	"fmt"
+	"image"
+	"image/draw"
+	"image/jpeg"
+	"image/png"
+	"os"
+)
+
+// LoadImage receives the path of an image file and returns it as an RGBA image,
+// along with its original format (e.g., "jpeg", "png").
+func LoadImage(filePath string) (*image.RGBA, string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, "", fmt.Errorf("[ERROR] Unable to load %s: %w", filePath, err)
+	}
+	defer file.Close()
+
+	img, format, err := image.Decode(file)
+	if err != nil {
+		return nil, "", fmt.Errorf("[ERROR] Unable to decode %s: %w", filePath, err)
+	}
+
+	bounds := img.Bounds()
+	rgba := image.NewRGBA(bounds)
+	draw.Draw(rgba, bounds, img, bounds.Min, draw.Src)
+
+	return rgba, format, nil
+}
+
+// SaveImage takes a RGBA image, its original encoding format and the path in
+// which it'll be stored and creates a new file containing the specified image
+// at that path.
+func SaveImage(img *image.RGBA, format string, outputPath string) error {
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("[ERROR] Unable to create file \"%s\": %w", outputPath, err)
+	}
+	defer outputFile.Close()
+
+	var encodingErr error
+	switch format {
+	case "jpeg":
+		encodingErr = jpeg.Encode(outputFile, img, &jpeg.Options{Quality: 95})
+	case "png":
+		encodingErr = png.Encode(outputFile, img)
+	default:
+		encodingErr = fmt.Errorf("[ERROR] Unsuported format: %s", format)
+	}
+
+	return encodingErr
+}

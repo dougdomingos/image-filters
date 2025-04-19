@@ -2,7 +2,7 @@
 
 DIST_DIR = ./bin
 BIN_FILE = image-filters
-CLI_PATH = ./src/cli
+CLI_PATH = ./cli
 
 run:   ## Run the CLI with args (e.g. make run IMG_PATH=img.jpg FILTER=grayscale)
 	go run $(CLI_PATH) -img $(IMG_PATH) -filter $(FILTER)

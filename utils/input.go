@@ -1,6 +1,9 @@
 package utils
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+)
 
 func ParseInputFlags() (string, string, string, int) {
 	imgPath := flag.String("img", "", "Path to image file")
@@ -10,4 +13,13 @@ func ParseInputFlags() (string, string, string, int) {
 	flag.Parse()
 
 	return *imgPath, *filterName, *executionMode, *workers
+}
+
+func ValidateExecutionMode(mode string) error {
+	var err error
+	if mode != "serial" && mode != "concurrent" {
+		err = fmt.Errorf("[ERROR]: Unknown execution model! %s", err)
+	}
+	
+	return err
 }

@@ -52,3 +52,14 @@ func SaveImage(img *image.RGBA, format string, outputPath string) error {
 
 	return encodingErr
 }
+
+// CreateOutputDir checks if a directory exists at the given path, and creates
+// it (with parents) if it doesn't.
+func CreateOutputDir(path string) error {
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("[ERROR]: Creating output directory failed! %s", err)
+	}
+
+	return err
+}

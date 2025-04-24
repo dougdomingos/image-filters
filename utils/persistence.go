@@ -7,6 +7,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"os"
+	"path/filepath"
 )
 
 // LoadImage receives the path of an image file and returns it as an RGBA image,
@@ -33,19 +34,19 @@ func LoadImage(filePath string) (*image.RGBA, string, error) {
 // SaveImage takes a RGBA image, its original encoding format and the path in
 // which it'll be stored and creates a new file containing the specified image
 // at that path.
-func SaveImage(img *image.RGBA, format string, outputPath string) error {
-	outputFile, err := os.Create(outputPath)
+func SaveImage(img *image.RGBA, format string, outputDir string, outputFile string) error {
+	file, err := os.Create(filepath.Join(outputDir, outputFile))
 	if err != nil {
-		return fmt.Errorf("[ERROR] Unable to create file \"%s\": %w", outputPath, err)
+		return fmt.Errorf("[ERROR] Unable to create file \"%s\": %w", outputDir, err)
 	}
-	defer outputFile.Close()
+	defer file.Close()
 
 	var encodingErr error
 	switch format {
 	case "jpeg":
-		encodingErr = jpeg.Encode(outputFile, img, &jpeg.Options{Quality: 95})
+		encodingErr = jpeg.Encode(file, img, &jpeg.Options{Quality: 95})
 	case "png":
-		encodingErr = png.Encode(outputFile, img)
+		encodingErr = png.Encode(file, img)
 	default:
 		encodingErr = fmt.Errorf("[ERROR] Unsuported format: %s", format)
 	}

@@ -8,14 +8,13 @@ import (
 )
 
 func main() {
-	inputImage, filterName, executionMode, workers := utils.ParseInputFlags()
+	inputImage, filterName, executionMode := utils.ParseInputFlags()
 
+	fmt.Printf("Running on %s mode...\n", executionMode)
 	if executionMode == "serial" {
 		// this shall work, eventually...
-		fmt.Printf("Running on %s mode...\n", executionMode)
 	} else if executionMode == "concurrent" {
 		// and so will this.
-		fmt.Printf("Running on %s mode with %d worker(s)...\n", executionMode, workers)
 	} else {
 		fmt.Printf("[ERROR] Unknown execution mode: %s\n", executionMode)
 		os.Exit(1)

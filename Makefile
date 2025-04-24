@@ -7,10 +7,9 @@ CLI_PATH = ./cli
 
 # Parameters
 MODE = serial
-WORKERS = 1
 
 run:   ## Run the CLI with args (e.g. make run IMG_PATH=img.jpg FILTER=grayscale MODE=serial)
-	go run $(CLI_PATH) -img $(IMG_PATH) -filter $(FILTER) -mode $(MODE) -workers $(WORKERS)
+	go run $(CLI_PATH) -img $(IMG_PATH) -filter $(FILTER) -mode $(MODE)
 
 build: ## Build the CLI binary. The binary name can be specified through the "BIN_FILE" flag
 	mkdir -p $(DIST_DIR)

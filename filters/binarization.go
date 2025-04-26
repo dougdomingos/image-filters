@@ -8,13 +8,34 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// BinarizationPipeline defines the sequence of steps require to apply the
+// binarization filter.
+//
+// This pipeline includes the following:
+//   - Preprocess: applies the Grayscale filter, required to correctly classify
+//     the pixels in the image by their intensity.
+//   - BuildConcurrent: calculates a global intensity threshold using the whole
+//     image, then returns a version of the filter injected with said
+//     threshold.
+var BinarizationPipeline = FilterPipeline{
+	Preprocess:      &GrayscalePipeline,
+	Filter:          Binarization,
+	BuildConcurrent: buildConcurrentBinarization,
+}
+
+// Binarization applies Otsu's thresholding method to binarize the image (i.e.
+// classify its pixels based on their intensity). Each pixel is classified as
+// black or white based on the obtained threshold:
+//
+//   - If the intensity of a given pixel is greater than the threshold, it's
+//     color is set to while
+//   - Otherwise, the pixel's color is set to black
 func Binarization(img *image.RGBA, bounds image.Rectangle) {
-	Grayscale(img, bounds)
 	var (
 		threshold uint8       = otsuThreshold(img, bounds)
 		newColor  color.Color = color.Black
 	)
-	
+
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			gray, _, _, _ := utils.GetRGBA8(img, x, y)
@@ -30,6 +51,37 @@ func Binarization(img *image.RGBA, bounds image.Rectangle) {
 	}
 }
 
+// buildConcurrentBinarization prepares a customized version of the
+// Binarization filter for concurrent execution. It calculates a single
+// global threshold using the entire image and injects it into a closure,
+// ensuring that all goroutines apply a consistent binarization logic.
+func buildConcurrentBinarization(img *image.RGBA, bounds image.Rectangle) Filter {
+	var (
+		threshold uint8       = otsuThreshold(img, bounds)
+		newColor  color.Color = color.Black
+	)
+
+	return func(image *image.RGBA, bounds image.Rectangle) {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				gray, _, _, _ := utils.GetRGBA8(img, x, y)
+				intensity := gray
+
+				newColor = color.Black
+				if intensity > threshold {
+					newColor = color.White
+				}
+
+				img.Set(x, y, newColor)
+			}
+		}
+	}
+}
+
+// otsuThreshold computes the optimal global threshold for binarization
+// based on Otsu's method. It analyzes the intensity histogram of the image
+// segment defined by bounds and returns the threshold value that maximizes
+// the variance between foreground and background classes.
 func otsuThreshold(img *image.RGBA, bounds image.Rectangle) uint8 {
 	var (
 		histogram        []uint32 = make([]uint32, 256)

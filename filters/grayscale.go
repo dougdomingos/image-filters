@@ -7,6 +7,16 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// GrayscalePipeline defines the grayscale filter pipeline.
+// 
+// This pipeline includes the following:
+// 	- Preprocess: none
+//  - BuildConcurrent: none; works on serial and concurrent modes by
+// 	  default
+var GrayscalePipeline = FilterPipeline{
+	Filter: Grayscale,
+}
+
 // Grayscale converts each pixel within a specified segment of the image into
 // its corresponding shade of gray.
 //

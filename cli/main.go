@@ -24,7 +24,7 @@ func main() {
 		terminateWithError(err, InvalidExecutionModeError)
 	}
 
-	filter, err := filters.GetFilter(filterName)
+	pipeline, err := filters.GetFilterPipeline(filterName)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}
@@ -34,9 +34,12 @@ func main() {
 		terminateWithError(err, ImageLoadingError)
 	}
 
-	applyFilter(imageRGBA, filter, executionMode)
-	imageFilename := filepath.Base(imagePath)
+	if pipeline.Preprocess != nil {
+		applyFilter(imageRGBA, *pipeline.Preprocess, executionMode)
+	}
+	applyFilter(imageRGBA, pipeline, executionMode)
 
+	imageFilename := filepath.Base(imagePath)
 	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, imageFilename)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)
@@ -46,12 +49,17 @@ func main() {
 }
 
 // applyFilter executes the given filter on the image using the specified mode.
-func applyFilter(imageRGBA *image.RGBA, filter filters.Filter, mode string) {
+func applyFilter(imageRGBA *image.RGBA, pipeline filters.FilterPipeline, mode string) {
 	switch mode {
 	case "serial":
-		engines.ExecuteSerial(imageRGBA, filter)
+		engines.ExecuteSerial(imageRGBA, pipeline.Filter)
 	case "concurrent":
-		engines.ExecuteConcurrent(imageRGBA, filter)
+		concurrentFilter := pipeline.Filter
+		if pipeline.BuildConcurrent != nil {
+			concurrentFilter = pipeline.BuildConcurrent(imageRGBA, imageRGBA.Bounds())
+		}
+
+		engines.ExecuteConcurrent(imageRGBA, concurrentFilter)
 	}
 }
 

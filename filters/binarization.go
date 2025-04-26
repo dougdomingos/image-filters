@@ -2,7 +2,6 @@ package filters
 
 import (
 	"image"
-	"image/color"
 	"math"
 
 	"dougdomingos.com/image-filters/utils"
@@ -23,6 +22,11 @@ var BinarizationPipeline = FilterPipeline{
 	BuildConcurrent: buildConcurrentBinarization,
 }
 
+var (
+	blackPixel = [4]uint8{0, 0, 0, 255}
+	whitePixel = [4]uint8{255, 255, 255, 255}
+)
+
 // Binarization applies Otsu's thresholding method to binarize the image (i.e.
 // classify its pixels based on their intensity). Each pixel is classified as
 // black or white based on the obtained threshold:
@@ -31,22 +35,19 @@ var BinarizationPipeline = FilterPipeline{
 //     color is set to while
 //   - Otherwise, the pixel's color is set to black
 func Binarization(img *image.RGBA, bounds image.Rectangle) {
-	var (
-		threshold uint8       = otsuThreshold(img, bounds)
-		newColor  color.Color = color.Black
-	)
+	threshold := otsuThreshold(img, bounds)
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		rowStart := (y - img.Rect.Min.Y) * img.Stride
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			gray, _, _, _ := utils.GetRGBA8(img, x, y)
-			intensity := gray
+			offset := rowStart + (x-img.Rect.Min.X)*4
+			intensity, _, _, _ := utils.GetRGBA8(img, x, y)
 
-			newColor = color.Black
 			if intensity > threshold {
-				newColor = color.White
+				copy(img.Pix[offset:offset+4], whitePixel[:])
+			} else {
+				copy(img.Pix[offset:offset+4], blackPixel[:])
 			}
-
-			img.Set(x, y, newColor)
 		}
 	}
 }
@@ -56,23 +57,21 @@ func Binarization(img *image.RGBA, bounds image.Rectangle) {
 // global threshold using the entire image and injects it into a closure,
 // ensuring that all goroutines apply a consistent binarization logic.
 func buildConcurrentBinarization(img *image.RGBA, bounds image.Rectangle) Filter {
-	var (
-		threshold uint8       = otsuThreshold(img, bounds)
-		newColor  color.Color = color.Black
-	)
+	threshold := otsuThreshold(img, bounds)
 
 	return func(image *image.RGBA, bounds image.Rectangle) {
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			rowStart := (y - img.Rect.Min.Y) * img.Stride
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				gray, _, _, _ := utils.GetRGBA8(img, x, y)
-				intensity := gray
+				offset := rowStart + (x-img.Rect.Min.X)*4
+				intensity, _, _, _ := utils.GetRGBA8(img, x, y)
 
-				newColor = color.Black
 				if intensity > threshold {
-					newColor = color.White
+					copy(img.Pix[offset:offset+4], whitePixel[:])
+				} else {
+					copy(img.Pix[offset:offset+4], blackPixel[:])
 				}
 
-				img.Set(x, y, newColor)
 			}
 		}
 	}

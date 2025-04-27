@@ -2,10 +2,7 @@
 // pixel-based manipulation techniques.
 package filters
 
-import (
-	"fmt"
-	"image"
-)
+import "image"
 
 // Filter is a function that applies a certain processing technique within a
 // defined segment of a image.
@@ -42,26 +39,4 @@ type FilterPipeline struct {
 	// injecting a global threshold). If nil, the Filter is assumed to be safe
 	// for concurrent use as-is.
 	BuildConcurrent func(img *image.RGBA, bounds image.Rectangle) Filter
-}
-
-// AvailableFilters maps a string identifier to its corresponding filter
-// pipeline.
-var AvaliableFilters = map[string]FilterPipeline{
-	"grayscale":    GrayscalePipeline,
-	"binarization": BinarizationPipeline,
-	"horizontal-flip": HorizontalFlipPipeline,
-	"vertical-flip": VerticalFlipPipeline,
-	// add more filters here...
-}
-
-// GetFilterPipeline retrieves a filter pipeline by its name from the
-// AvailableFilters map. It returns the pipeline if found, or an error if the
-// specified name is not defined.
-func GetFilterPipeline(filterName string) (FilterPipeline, error) {
-	pipeline, exists := AvaliableFilters[filterName]
-	if !exists {
-		return FilterPipeline{}, fmt.Errorf("[ERROR]: Specified filter does not exist")
-	}
-
-	return pipeline, nil
 }

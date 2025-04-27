@@ -33,10 +33,7 @@ func main() {
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
 	}
-
-	if pipeline.Preprocess != nil {
-		applyFilter(imageRGBA, *pipeline.Preprocess, executionMode)
-	}
+	
 	applyFilter(imageRGBA, pipeline, executionMode)
 
 	imageFilename := filepath.Base(imagePath)
@@ -52,14 +49,9 @@ func main() {
 func applyFilter(imageRGBA *image.RGBA, pipeline filters.FilterPipeline, mode string) {
 	switch mode {
 	case "serial":
-		engines.ExecuteSerial(imageRGBA, pipeline.Filter)
+		engines.ExecuteSerial(imageRGBA, pipeline)
 	case "concurrent":
-		concurrentFilter := pipeline.Filter
-		if pipeline.BuildConcurrent != nil {
-			concurrentFilter = pipeline.BuildConcurrent(imageRGBA, imageRGBA.Bounds())
-		}
-
-		engines.ExecuteConcurrent(imageRGBA, concurrentFilter)
+		engines.ExecuteConcurrent(imageRGBA, pipeline)
 	}
 }
 

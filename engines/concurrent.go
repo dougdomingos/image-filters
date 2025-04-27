@@ -2,7 +2,6 @@ package engines
 
 import (
 	"image"
-	"runtime"
 	"sync"
 
 	"dougdomingos.com/image-filters/filters"
@@ -13,7 +12,7 @@ import (
 // by splitting it into several segments, assigning each one to a goroutine.
 func ExecuteConcurrent(img *image.RGBA, pipeline filters.FilterPipeline) {
 	var (
-		workers     = runtime.NumCPU()
+		workers     = utils.GetNumberOfWorkers(img.Bounds())
 		imageStrips = utils.GetVerticalStrips(img.Bounds(), workers)
 		wg sync.WaitGroup
 	)

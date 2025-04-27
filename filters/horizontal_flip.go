@@ -3,6 +3,7 @@ package filters
 import (
 	"image"
 
+	"dougdomingos.com/image-filters/partitions"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -12,9 +13,7 @@ import (
 //   - Preprocess: none
 //   - BuildConcurrent: none; works on serial and concurrent modes.
 //     Requires horizontal segmentation for concurrent mode.
-var HorizontalFlipPipeline = FilterPipeline{
-	Filter: HorizontalFlip,
-}
+var HorizontalFlipPipeline = BuildFilterPipeline(HorizontalFlip, nil, nil, partitions.GetHorizontalPartitions)
 
 // HorizontalFlip reverses the order of each line of pixels within the
 // specified segment of the image.

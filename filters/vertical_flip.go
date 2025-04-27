@@ -3,6 +3,7 @@ package filters
 import (
 	"image"
 
+	"dougdomingos.com/image-filters/partitions"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -12,9 +13,7 @@ import (
 //   - Preprocess: none
 //   - BuildConcurrent: none; works on serial and concurrent modes.
 //     Requires vertical segmentation for concurrent mode.
-var VerticalFlipPipeline = FilterPipeline{
-	Filter: VerticalFlip,
-}
+var VerticalFlipPipeline = BuildFilterPipeline(VerticalFlip, nil, nil, partitions.GetVerticalPartitions)
 
 // VerticalFlip reverses the order of each column of pixels within the
 // specified segment of the image.

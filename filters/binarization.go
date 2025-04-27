@@ -16,11 +16,7 @@ import (
 //   - BuildConcurrent: calculates a global intensity threshold using the whole
 //     image, then returns a version of the filter injected with said
 //     threshold.
-var BinarizationPipeline = FilterPipeline{
-	Preprocess:      &GrayscalePipeline,
-	Filter:          Binarization,
-	BuildConcurrent: buildConcurrentBinarization,
-}
+var BinarizationPipeline = BuildFilterPipeline(Binarization, &GrayscalePipeline, buildConcurrentBinarization, nil)
 
 var (
 	blackPixel = [4]uint8{0, 0, 0, 255}

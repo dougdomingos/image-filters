@@ -33,11 +33,3 @@ func VerticalFlip(img *image.RGBA, bounds image.Rectangle) {
 		}
 	}
 }
-
-// swapPixelsInColumn swaps two pixels' positions within the same column.
-func swapPixelsInColumn(img *image.RGBA, topOffset, bottomOffset int) {
-	tmpPixel := make([]uint8, 4)
-	copy(tmpPixel[:], img.Pix[topOffset:topOffset+4])
-	copy(img.Pix[topOffset:topOffset+4], img.Pix[bottomOffset:bottomOffset+4])
-	copy(img.Pix[bottomOffset:bottomOffset+4], tmpPixel[:])
-}

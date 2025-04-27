@@ -49,6 +49,8 @@ type FilterPipeline struct {
 var AvaliableFilters = map[string]FilterPipeline{
 	"grayscale":    GrayscalePipeline,
 	"binarization": BinarizationPipeline,
+	"horizontal-flip": HorizontalFlipPipeline,
+	"vertical-flip": VerticalFlipPipeline,
 	// add more filters here...
 }
 

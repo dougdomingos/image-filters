@@ -3,8 +3,9 @@
 package filters
 
 import (
-	"fmt"
 	"image"
+
+	"dougdomingos.com/image-filters/partitions"
 )
 
 // Filter is a function that applies a certain processing technique within a
@@ -18,12 +19,31 @@ import (
 // image that the filter should operate on.
 type Filter func(image *image.RGBA, bounds image.Rectangle)
 
+// ConcurrentFilter defines the configuration for executing a filter
+// concurrently by partitioning the image into segments and providing
+// a mechanism to build per-partition filters.
+type ConcurrentFilter struct {
+
+	// Builder is a function that, given the full image and bounds for a segment,
+	// returns a Filter adapted to process that segment. It can inject
+	// stateful or context-specific behavior required for concurrent execution.
+	Builder func(img *image.RGBA, bounds image.Rectangle) Filter
+
+	// PartitionMethod defines how the image is divided into partitions for
+	// concurrent processing. Different partitioning strategies can be used
+	// to optimize for specific workloads.
+	PartitionMethod partitions.ImagePartitioner
+}
+
 // FilterPipeline defines the entire processing flow of a filter, composed of
 // an optional preprocessing step, the core filter and an optional closure
 // function to adapt filters for concurrent workflows.
 //
 // A pipeline can recursively chain preprocessing steps, making it flexible for
 // building complex operations by composing a series of simpler ones.
+//
+// When creating a new pipeline, please use the BuildPipelineFilter function,
+// which ensures that the pipeline will be well formed.
 type FilterPipeline struct {
 
 	// Preprocess defines an optional preprocessing pipeline to be applied
@@ -37,29 +57,33 @@ type FilterPipeline struct {
 	// boundaries should be modified.
 	Filter Filter
 
-	// BuildConcurrent, if non-nil, is called once with the full image bounds
-	// to return a custom Filter suitable for concurrent execution (e.g.
-	// injecting a global threshold). If nil, the Filter is assumed to be safe
-	// for concurrent use as-is.
-	BuildConcurrent func(img *image.RGBA, bounds image.Rectangle) Filter
+	// ConcurrentFilter defines the configuration needed for running the filter
+	// concurrently, including the method for partitioning the image and
+	// building per-partition filters.
+	ConcurrentFilter ConcurrentFilter
 }
 
-// AvailableFilters maps a string identifier to its corresponding filter
-// pipeline.
-var AvaliableFilters = map[string]FilterPipeline{
-	"grayscale":    GrayscalePipeline,
-	"binarization": BinarizationPipeline,
-	// add more filters here...
-}
+// BuildFilterPipeline creates and initializes a FilterPipeline with the
+// provided core filter, optional preprocessing step, concurrent builder
+// function, and partitioning strategy.
+//
+// If partitioner is nil, the vertical partitioning method is used by default.
+func BuildFilterPipeline(
+	filter Filter,
+	preprocess *FilterPipeline,
+	concurrentBuilder func(img *image.RGBA, bounds image.Rectangle) Filter,
+	partitioner partitions.ImagePartitioner) FilterPipeline {
 
-// GetFilterPipeline retrieves a filter pipeline by its name from the
-// AvailableFilters map. It returns the pipeline if found, or an error if the
-// specified name is not defined.
-func GetFilterPipeline(filterName string) (FilterPipeline, error) {
-	pipeline, exists := AvaliableFilters[filterName]
-	if !exists {
-		return FilterPipeline{}, fmt.Errorf("[ERROR]: Specified filter does not exist")
+	if partitioner == nil {
+		partitioner = partitions.GetVerticalPartitions
 	}
 
-	return pipeline, nil
+	return FilterPipeline{
+		Preprocess: preprocess,
+		Filter:     filter,
+		ConcurrentFilter: ConcurrentFilter{
+			Builder:         concurrentBuilder,
+			PartitionMethod: partitioner,
+		},
+	}
 }

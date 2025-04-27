@@ -12,9 +12,7 @@ import (
 //   - Preprocess: none
 //   - BuildConcurrent: none; works on serial and concurrent modes by
 //     default
-var GrayscalePipeline = FilterPipeline{
-	Filter: Grayscale,
-}
+var GrayscalePipeline = BuildFilterPipeline(Grayscale, nil, nil, nil)
 
 // Grayscale converts each pixel within a specified segment of the image into
 // its corresponding shade of gray.

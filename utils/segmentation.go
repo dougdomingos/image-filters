@@ -26,23 +26,11 @@ func GetVerticalStrips(bounds image.Rectangle, stripCount int) []image.Rectangle
 // GetNumberOfWorkers calculates the optimal number of workers based on the
 // number of logical CPUs available and the size of the task (given by the
 // bounds). The function considers both the number of available CPUs and the
-// greatest common divisor (GCD) between the number of CPUs and the segment
-// size per  CPU to determine the most efficient number of workers for
-// processing.
-//
-// It calculates the GCD between the number of CPUs and the segment size
-// (i.e., the width of the bounds divided by the number of logical CPUs) and
-// returns the smaller of the number of CPUs and the GCD.
+// width of each worker's segment. It also ensures that, if the width of the
+// segments is less than zero, the returned value would be 1.
 func GetNumberOfWorkers(bounds image.Rectangle) int {
 	numLogicCPUs := runtime.NumCPU()
-	gcd := func(a, b int) int {
-		for b != 0 {
-			a, b = b, a%b
-		}
+	segmentWidthPerLogicCPU := bounds.Max.X / numLogicCPUs
 
-		return a
-	}
-
-	segmentSizePerCPU := bounds.Max.X / numLogicCPUs
-	return min(numLogicCPUs, gcd(numLogicCPUs, segmentSizePerCPU))
+	return max(min(numLogicCPUs, segmentWidthPerLogicCPU), 1)
 }

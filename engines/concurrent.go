@@ -12,20 +12,25 @@ import (
 // by splitting it into several segments, assigning each one to a goroutine.
 func ExecuteConcurrent(img *image.RGBA, pipeline filters.FilterPipeline) {
 	var (
-		workers     = getNumberOfWorkers(img.Bounds())
-		imageStrips = pipeline.ConcurrentFilter.PartitionMethod(img.Bounds(), workers)
-		wg sync.WaitGroup
+		filterToApply = pipeline.Filter
+		workers       = getNumberOfWorkers(img.Bounds())
+		imageStrips   = pipeline.ConcurrentFilter.PartitionMethod(img.Bounds(), workers)
+		wg            sync.WaitGroup
 	)
 
 	if pipeline.Preprocess != nil {
 		ExecuteConcurrent(img, *pipeline.Preprocess)
 	}
-	
+
+	if pipeline.ConcurrentFilter.Builder != nil {
+		filterToApply = pipeline.ConcurrentFilter.Builder(img, img.Bounds())
+	}
+
 	wg.Add(len(imageStrips))
 	for strip := range imageStrips {
 		go func(s image.Rectangle) {
 			defer wg.Done()
-			pipeline.Filter(img, s)
+			filterToApply(img, s)
 		}(imageStrips[strip])
 	}
 

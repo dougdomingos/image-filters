@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"os"
 	"path/filepath"
 
 	"dougdomingos.com/image-filters/engines"
@@ -12,32 +11,32 @@ import (
 )
 
 func main() {
-	imagePath, outputDir, filterName, executionMode := utils.ParseInputFlags()
+	parsedFlags := parseInputFlags()
 
-	err := utils.CreateOutputDir(outputDir)
+	err := utils.CreateOutputDir(parsedFlags.OutputDir)
 	if err != nil {
 		terminateWithError(err, OutputDirError)
 	}
 
-	err = utils.ValidateExecutionMode(executionMode)
+	err = validateExecutionMode(parsedFlags.ExecutionMode)
 	if err != nil {
 		terminateWithError(err, InvalidExecutionModeError)
 	}
 
-	pipeline, err := filters.GetFilterPipeline(filterName)
+	pipeline, err := filters.GetFilterPipeline(parsedFlags.FilterName)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}
 
-	imageRGBA, format, err := utils.LoadImage(imagePath)
+	imageRGBA, format, err := utils.LoadImage(parsedFlags.ImgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
 	}
-	
-	applyFilter(imageRGBA, pipeline, executionMode)
 
-	imageFilename := filepath.Base(imagePath)
-	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, imageFilename)
+	applyFilter(imageRGBA, pipeline, parsedFlags.ExecutionMode)
+
+	imageFilename := filepath.Base(parsedFlags.ImgPath)
+	outputPath, err := utils.SaveImage(imageRGBA, format, parsedFlags.OutputDir, imageFilename)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)
 	}
@@ -53,10 +52,4 @@ func applyFilter(imageRGBA *image.RGBA, pipeline filters.FilterPipeline, mode st
 	case "concurrent":
 		engines.ExecuteConcurrent(imageRGBA, pipeline)
 	}
-}
-
-// terminateWithError prints the error and exits the program with the given code.
-func terminateWithError(err error, code int) {
-	fmt.Println(err)
-	os.Exit(code)
 }

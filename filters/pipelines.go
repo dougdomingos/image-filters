@@ -5,10 +5,12 @@ import "fmt"
 // AvailableFilters maps a string identifier to its corresponding filter
 // pipeline.
 var AvaliableFilters = map[string]FilterPipeline{
-	"grayscale":    GrayscalePipeline,
-	"binarization": BinarizationPipeline,
-	"horizontal-flip": HorizontalFlipPipeline,
-	"vertical-flip": VerticalFlipPipeline,
+	"binarization":     BinarizationPipeline,
+	"grayscale":        GrayscalePipeline,
+	"horizontal-flip":  HorizontalFlipPipeline,
+	"sobel":            SobelPipeline,
+	"sobel-grayscaled": SobelGrayscaledPipeline,
+	"vertical-flip":    VerticalFlipPipeline,
 	// add more filters here...
 }
 

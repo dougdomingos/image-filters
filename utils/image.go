@@ -23,3 +23,20 @@ func SwapPixels(img *image.RGBA, offsetX, offsetY int) {
 		img.Pix[offsetX+i], img.Pix[offsetY+i] = img.Pix[offsetY+i], img.Pix[offsetX+i]
 	}
 }
+
+
+// CopyImagePartition creates a copy of a region of the provided image.
+func CopyImagePartition(img *image.RGBA, bounds image.Rectangle) image.RGBA {
+	copiedPartition := image.NewRGBA(bounds)
+
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			srcOffset := img.PixOffset(x, y)
+			dstOffset := copiedPartition.PixOffset(x, y)
+
+			copy(copiedPartition.Pix[dstOffset:dstOffset+4], img.Pix[srcOffset:srcOffset+4])
+		}
+	}
+
+	return *copiedPartition
+}

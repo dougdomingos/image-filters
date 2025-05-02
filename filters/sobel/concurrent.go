@@ -14,16 +14,17 @@ import (
 // routines, which then modify their respective partitions.
 func concurrentSobel(img *image.RGBA) {
 	var (
+		padding     = 1
 		bounds      = img.Bounds()
 		numWorkers  = partitioning.GetNumberOfWorkers(bounds)
 		imageStrips = partitioning.GetVerticalPartitions(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)
 
-	copyImg := utils.CopyImagePartition(img, bounds)
+	copyImg := utils.CopyImagePartitionWithPadding(img, bounds, padding)
 	wg.Add(len(imageStrips))
 	for strip := range imageStrips {
-		go sobelWorker(img, imageStrips[strip], &copyImg, &wg)
+		go sobelWorker(img, imageStrips[strip], &copyImg, padding, &wg)
 	}
 
 	wg.Wait()
@@ -32,13 +33,16 @@ func concurrentSobel(img *image.RGBA) {
 // sobelWorker processes a subregion of the image by applying the sobel filter
 // based on a global copy of the original image, which is used to compute the
 // gradients of each color channel.
-func sobelWorker(img *image.RGBA, bounds image.Rectangle, copyImg *image.RGBA, wg *sync.WaitGroup) {
+func sobelWorker(img *image.RGBA, bounds image.Rectangle, copyImg *image.RGBA, padding int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		rowStart := (y - img.Rect.Min.Y) * img.Stride
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			offset := rowStart + (x-img.Rect.Min.X)*4
+	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+padding, copyImg.Rect.Max.X-padding
+	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+padding, copyImg.Rect.Max.Y-padding
+
+	for y := paddedMinY; y < paddedMaxY; y++ {
+		srcRowStart := (y - padding) * img.Stride
+		for x := paddedMinX; x < paddedMaxX; x++ {
+			offset := srcRowStart + (x-padding)*4
 
 			var r8, g8, b8, a8 uint8
 			var gxR, gxG, gxB, gyR, gyG, gyB int
@@ -47,11 +51,6 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, copyImg *image.RGBA, w
 				for kx := -1; kx <= 1; kx++ {
 					deltaX := x + kx
 					deltaY := y + ky
-
-					// If the current neighbor is outside of the image, jump to next iteration
-					if !isPositionWithinImage(img, deltaX, deltaY) {
-						continue
-					}
 
 					r8, g8, b8, a8 = utils.GetRGBA8(copyImg, deltaX, deltaY)
 					r := int(r8)

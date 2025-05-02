@@ -7,6 +7,9 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// ApplyFilterPipeline handles the execution of a filter pipeline, applying
+// preprocessing steps recursively (if needed) and selecting the filter
+// implementation to be executed.
 func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConcurrent bool) error {
 	preprocess := pipeline.Preprocess
 
@@ -14,33 +17,20 @@ func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConc
 		ApplyFilterPipeline(img, preprocess, isConcurrent)
 	}
 
-	filter := getFilter(pipeline, isConcurrent)
+	filter := getFilterFromPipeline(pipeline, isConcurrent)
 	if filter == nil {
-		return fmt.Errorf("pipeline has no implementation for mode \"%s\"", getExecutionMode(isConcurrent))
+		return fmt.Errorf("[ERROR] selected pipeline has no implementation for current execution mode")
 	}
 
 	filter(img)
 	return nil
 }
 
-func getFilter(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
-	var filter types.Filter
+// getFilterFromPipeline returns the filter function that corresponds to the
+// selected execution mode (either serial or concurrent).
+func getFilterFromPipeline(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
 	if isConcurrent {
-		filter = pipeline.ConcurrentFilter
-	} else {
-		filter = pipeline.SerialFilter
+		return pipeline.ConcurrentFilter
 	}
-
-	return filter
-}
-
-func getExecutionMode(isConcurrent bool) string {
-	var mode string
-	if isConcurrent {
-		mode = "concurrent"
-	} else {
-		mode = "serial"
-	}
-
-	return mode
+	return pipeline.SerialFilter
 }

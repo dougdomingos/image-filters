@@ -14,7 +14,7 @@ import (
 func concurrentHorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = 8
+		numWorkers  = partitions.GetNumberOfWorkers(bounds)
 		imageStrips = partitions.GetHorizontalPartitions(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)

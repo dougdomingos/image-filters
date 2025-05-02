@@ -13,7 +13,7 @@ import (
 func concurrentGrayscale(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = 8
+		numWorkers  = partitions.GetNumberOfWorkers(bounds)
 		imageStrips = partitions.GetVerticalPartitions(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)

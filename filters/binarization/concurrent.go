@@ -14,7 +14,7 @@ import (
 func concurrentBinarization(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = 8
+		numWorkers  = partitions.GetNumberOfWorkers(bounds)
 		imageStrips = partitions.GetVerticalPartitions(bounds, numWorkers)
 		threshold   = otsuThreshold(img, bounds)
 		wg          sync.WaitGroup

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"image"
 
-	"dougdomingos.com/image-filters/filters"
+	"dougdomingos.com/image-filters/filters/types"
 )
 
-func ApplyFilterPipeline(img *image.RGBA, pipeline *filters.FilterPipeline, isConcurrent bool) error {
+func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConcurrent bool) error {
 	preprocess := pipeline.Preprocess
 
 	if preprocess != nil {
@@ -23,8 +23,8 @@ func ApplyFilterPipeline(img *image.RGBA, pipeline *filters.FilterPipeline, isCo
 	return nil
 }
 
-func getFilter(pipeline *filters.FilterPipeline, isConcurrent bool) filters.Filter {
-	var filter filters.Filter
+func getFilter(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
+	var filter types.Filter
 	if isConcurrent {
 		filter = pipeline.ConcurrentFilter
 	} else {

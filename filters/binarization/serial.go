@@ -6,6 +6,10 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialBinarization applies the binarization filter to the entire image in a
+// single pass. It computes a global brighness threshold of the image using
+// Otsu's method, then colors the pixels as white or black, depending of their
+// intensity.
 func serialBinarization(img *image.RGBA) {
 	bounds := img.Bounds()
 	threshold := otsuThreshold(img, bounds)

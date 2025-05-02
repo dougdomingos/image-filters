@@ -6,6 +6,8 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialVerticalFlip applies the vertical flip filter to the entire image in a
+// single pass. It reverses the order of the pixels of each column.
 func serialVerticalFlip(img *image.RGBA) {
 	bounds := img.Bounds()
 	middle := (bounds.Max.Y - bounds.Min.Y) / 2

@@ -8,14 +8,17 @@ import (
 )
 
 var (
+	// blackPixel represents a fully opaque black pixel in RGBA format
 	blackPixel = []uint8{0, 0, 0, 255}
+
+	// whitePixel represents a fully opaque white pixel in RGBA format
 	whitePixel = []uint8{255, 255, 255, 255}
 )
 
 // otsuThreshold computes the optimal global threshold for binarization
 // based on Otsu's method. It analyzes the intensity histogram of the image
-// segment defined by bounds and returns the threshold value that maximizes
-// the variance between foreground and background classes.
+// paritition and  returns the threshold value that maximizes the variance
+// between foreground and background component.
 func otsuThreshold(img *image.RGBA, bounds image.Rectangle) uint8 {
 	var (
 		histogram        []uint32 = make([]uint32, 256)

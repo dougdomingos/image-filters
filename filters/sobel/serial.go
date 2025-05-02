@@ -7,6 +7,9 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialSobel applies the sobel filter to the entire image in a single pass.
+// It creates a full copy of the original image, using it to calculate the
+// color channel gradients for each pixel of the image.
 func serialSobel(img *image.RGBA) {
 	bounds := img.Bounds()
 	originalImg := utils.CopyImagePartition(img, bounds)

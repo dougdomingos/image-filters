@@ -8,6 +8,9 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// concurrentHorizontalFlip applies the horizontal flip filter to the entire
+// image using multiple goroutines. The image is divided into horizontal strips
+// to ensure the correct mirrored layout.
 func concurrentHorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -18,13 +21,15 @@ func concurrentHorizontalFlip(img *image.RGBA) {
 
 	wg.Add(len(imageStrips))
 	for strip := range imageStrips {
-		go HorizontalFlipWorker(img, imageStrips[strip], &wg)
+		go horizontalFlipWorker(img, imageStrips[strip], &wg)
 	}
 
 	wg.Wait()
 }
 
-func HorizontalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
+// horizontalFlipWorker processes a subregion of the image by reversing the
+// order of each row within its respective boundaries.
+func horizontalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
 	defer wg.Done()
 	middle := (bounds.Max.X - bounds.Min.X) / 2
 

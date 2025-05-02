@@ -6,6 +6,9 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialGrayscale applies the grayscale filter to the entire image in a single
+// pass. It computes the Rec. 601 luma transform for each pixel in the image,
+// updating its color channels to match its result.
 func serialGrayscale(img *image.RGBA) {
 	bounds := img.Bounds()
 
@@ -15,7 +18,7 @@ func serialGrayscale(img *image.RGBA) {
 			offset := rowStart + (x-img.Rect.Min.X)*4
 
 			r, g, b, a := utils.GetRGBA8(img, x, y)
-			gray := RunLumaTransform(r, g, b)
+			gray := runLumaTransform(r, g, b)
 
 			copy(img.Pix[offset:offset+4], []uint8{gray, gray, gray, a})
 		}

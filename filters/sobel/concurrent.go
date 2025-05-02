@@ -9,6 +9,9 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// concurrentSobel applies the sobel filter to the entire image using multiple
+// goroutines. It makes a full copy of the image, which is shared amongst the
+// routines, which then modify their respective partitions.
 func concurrentSobel(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -20,13 +23,16 @@ func concurrentSobel(img *image.RGBA) {
 	copyImg := utils.CopyImagePartition(img, bounds)
 	wg.Add(len(imageStrips))
 	for strip := range imageStrips {
-		go SobelWorker(img, imageStrips[strip], &copyImg, &wg)
+		go sobelWorker(img, imageStrips[strip], &copyImg, &wg)
 	}
 
 	wg.Wait()
 }
 
-func SobelWorker(img *image.RGBA, bounds image.Rectangle, copyImg *image.RGBA, wg *sync.WaitGroup) {
+// sobelWorker processes a subregion of the image by applying the sobel filter
+// based on a global copy of the original image, which is used to compute the
+// gradients of each color channel.
+func sobelWorker(img *image.RGBA, bounds image.Rectangle, copyImg *image.RGBA, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {

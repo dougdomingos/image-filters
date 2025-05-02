@@ -8,11 +8,14 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// concurrentBinarization applies the binarization filter to the entire image
+// using multiple goroutines. It first computes Otsu's global threshold,
+// then partitions the image and processes each partition concurrently.
 func concurrentBinarization(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = 8
-		imageStrips = partitions.GetHorizontalPartitions(bounds, numWorkers)
+		imageStrips = partitions.GetVerticalPartitions(bounds, numWorkers)
 		threshold   = otsuThreshold(img, bounds)
 		wg          sync.WaitGroup
 	)
@@ -25,6 +28,10 @@ func concurrentBinarization(img *image.RGBA) {
 	wg.Wait()
 }
 
+// binarizationWorker processes a subregion of the image by applying the
+// binarization filter based on a shared global threshold. It updates each
+// pixel in the subregion to either black or white, depending on it's
+// intensity.
 func binarizationWorker(img *image.RGBA, bounds image.Rectangle, threshold uint8, wg *sync.WaitGroup) {
 	defer wg.Done()
 

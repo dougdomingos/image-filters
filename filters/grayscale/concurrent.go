@@ -8,17 +8,14 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
-// concurrentGrayscale converts each pixel within a specified segment of the image into
-// its corresponding shade of gray.
-//
-// This implementation uses the Rec. 601 luma transform to compute the
-// grayscale value. The alpha channel is left unmodified.
+// concurrentGrayscale applies the grayscale filter to the entire image using
+// multiple goroutines to process different partitions concurrently.
 func concurrentGrayscale(img *image.RGBA) {
 	var (
-		bounds = img.Bounds()
-		numWorkers = 8
+		bounds      = img.Bounds()
+		numWorkers  = 8
 		imageStrips = partitions.GetVerticalPartitions(bounds, numWorkers)
-		wg sync.WaitGroup
+		wg          sync.WaitGroup
 	)
 
 	wg.Add(len(imageStrips))
@@ -29,6 +26,8 @@ func concurrentGrayscale(img *image.RGBA) {
 	wg.Wait()
 }
 
+// grayscaleWorker processes a partition of the original image by applying the
+// grayscale filter to such partition.
 func grayscaleWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -38,7 +37,7 @@ func grayscaleWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup
 			offset := rowStart + (x-img.Rect.Min.X)*4
 
 			r, g, b, a := utils.GetRGBA8(img, x, y)
-			gray := RunLumaTransform(r, g, b)
+			gray := runLumaTransform(r, g, b)
 
 			copy(img.Pix[offset:offset+4], []uint8{gray, gray, gray, a})
 		}

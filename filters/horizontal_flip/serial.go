@@ -6,6 +6,8 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialHorizontalFlip applies the horizontal flip filter to the entire image
+// in a single pass. It reverses the order of the pixels on each row.
 func serialHorizontalFlip(img *image.RGBA) {
 	bounds := img.Bounds()
 	middle := (bounds.Max.X - bounds.Min.X) / 2

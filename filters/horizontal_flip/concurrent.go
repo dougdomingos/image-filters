@@ -4,7 +4,7 @@ import (
 	"image"
 	"sync"
 
-	"dougdomingos.com/image-filters/partitions"
+	"dougdomingos.com/image-filters/filters/partitioning"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -14,8 +14,8 @@ import (
 func concurrentHorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = partitions.GetNumberOfWorkers(bounds)
-		imageStrips = partitions.GetHorizontalPartitions(bounds, numWorkers)
+		numWorkers  = partitioning.GetNumberOfWorkers(bounds)
+		imageStrips = partitioning.GetHorizontalPartitions(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)
 

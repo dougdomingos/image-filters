@@ -1,4 +1,4 @@
-package partitions
+package partitioning
 
 import (
 	"image"

@@ -1,5 +1,5 @@
 // Package partitions provides a set of image partitioning utility functions.
-package partitions
+package partitioning
 
 import "image"
 

@@ -3,19 +3,23 @@ package filters
 import (
 	"fmt"
 
+	"dougdomingos.com/image-filters/filters/binarization"
 	"dougdomingos.com/image-filters/filters/grayscale"
+	"dougdomingos.com/image-filters/filters/horizontal_flip"
+	"dougdomingos.com/image-filters/filters/sobel"
 	"dougdomingos.com/image-filters/filters/types"
+	"dougdomingos.com/image-filters/filters/vertical_flip"
 )
 
 // AvailableFilters maps a string identifier to its corresponding filter
 // pipeline.
 var AvaliableFilters = map[string]types.FilterPipeline{
-	"binarization":     BinarizationPipeline,
+	"binarization":     binarization.BinarizationPipeline,
 	"grayscale":        grayscale.GrayscalePipeline,
-	"horizontal-flip":  HorizontalFlipPipeline,
-	"sobel":            SobelPipeline,
-	"sobel-grayscaled": SobelGrayscaledPipeline,
-	"vertical-flip":    VerticalFlipPipeline,
+	"horizontal-flip":  horizontal_flip.HorizontalFlipPipeline,
+	"sobel":            sobel.SobelPipeline,
+	"sobel-grayscaled": sobel.SobelGrayscaledPipeline,
+	"vertical-flip":    vertical_flip.VerticalFlipPipeline,
 	// add more filters here...
 }
 

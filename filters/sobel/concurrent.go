@@ -35,8 +35,11 @@ func concurrentSobel(img *image.RGBA) {
 // gradients of each color channel.
 func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.WaitGroup) {
 	defer mainWg.Done()
+	copyImg := func() image.RGBA {
+		defer copyWg.Done()
+		return imgutil.CopyPaddedImagePartition(img, bounds, copyPadding)
+	}()
 
-	copyImg := waitForCopy(imgutil.CopyPaddedImagePartition, img, bounds, copyPadding, copyWg)
 	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
 	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding
 
@@ -82,9 +85,4 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.W
 			copy(img.Pix[offset:offset+4], []uint8{gradR, gradG, gradB, a8})
 		}
 	}
-}
-
-func waitForCopy(copy imgutil.PartitionCopier, img *image.RGBA, bounds image.Rectangle, padding int, wg *sync.WaitGroup) image.RGBA {
-	defer wg.Done()
-	return copy(img, bounds, padding)
 }

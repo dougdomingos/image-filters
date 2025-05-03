@@ -4,7 +4,7 @@ import (
 	"image"
 	"sync"
 
-	"dougdomingos.com/image-filters/filters/partitioning"
+	"dougdomingos.com/image-filters/filters/imgutil"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -13,8 +13,8 @@ import (
 func concurrentGrayscale(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = partitioning.GetNumberOfWorkers(bounds)
-		imageStrips = partitioning.GetVerticalPartitions(bounds, numWorkers)
+		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
+		imageStrips = imgutil.GetVerticalPartitions(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)
 

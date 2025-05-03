@@ -5,7 +5,7 @@ import (
 	"math"
 	"sync"
 
-	"dougdomingos.com/image-filters/filters/partitioning"
+	"dougdomingos.com/image-filters/filters/imgutil"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -15,8 +15,8 @@ import (
 func concurrentSobel(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
-		numWorkers  = partitioning.GetNumberOfWorkers(bounds)
-		imageStrips = partitioning.GetVerticalPartitions(bounds, numWorkers)
+		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
+		imageStrips = imgutil.GetVerticalPartitions(bounds, numWorkers)
 		mainWg      sync.WaitGroup
 		copyWg      sync.WaitGroup
 	)
@@ -36,7 +36,7 @@ func concurrentSobel(img *image.RGBA) {
 func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.WaitGroup) {
 	defer mainWg.Done()
 
-	copyImg := waitForCopy(utils.CopyImagePartitionWithPadding, img, bounds, copyPadding, copyWg)
+	copyImg := waitForCopy(imgutil.CopyPaddedImagePartition, img, bounds, copyPadding, copyWg)
 	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
 	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding
 
@@ -84,9 +84,7 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.W
 	}
 }
 
-type PaddedCopyFunction func(*image.RGBA, image.Rectangle, int) image.RGBA
-
-func waitForCopy(copy PaddedCopyFunction, img *image.RGBA, bounds image.Rectangle, padding int, wg *sync.WaitGroup) image.RGBA {
+func waitForCopy(copy imgutil.PartitionCopier, img *image.RGBA, bounds image.Rectangle, padding int, wg *sync.WaitGroup) image.RGBA {
 	defer wg.Done()
 	return copy(img, bounds, padding)
 }

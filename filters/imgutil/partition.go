@@ -1,4 +1,4 @@
-package partitioning
+package imgutil
 
 import (
 	"image"

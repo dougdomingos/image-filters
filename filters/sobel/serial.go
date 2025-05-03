@@ -4,6 +4,7 @@ import (
 	"image"
 	"math"
 
+	"dougdomingos.com/image-filters/filters/imgutil"
 	"dougdomingos.com/image-filters/utils"
 )
 
@@ -12,7 +13,7 @@ import (
 // color channel gradients for each pixel of the image.
 func serialSobel(img *image.RGBA) {
 	bounds := img.Bounds()
-	copyImg := utils.CopyImagePartitionWithPadding(img, bounds, copyPadding)
+	copyImg := imgutil.CopyPaddedImagePartition(img, bounds, copyPadding)
 
 	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
 	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding

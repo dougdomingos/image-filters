@@ -12,12 +12,15 @@ import (
 // color channel gradients for each pixel of the image.
 func serialSobel(img *image.RGBA) {
 	bounds := img.Bounds()
-	originalImg := utils.CopyImagePartition(img, bounds)
+	copyImg := utils.CopyImagePartitionWithPadding(img, bounds, copyPadding)
 
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		rowStart := (y - img.Rect.Min.Y) * img.Stride
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			offset := rowStart + (x-img.Rect.Min.X)*4
+	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
+	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding
+
+	for y := paddedMinY; y < paddedMaxY; y++ {
+		srcRowStart := (y - copyPadding) * img.Stride
+		for x := paddedMinX; x < paddedMaxX; x++ {
+			offset := srcRowStart + (x-copyPadding)*4
 
 			var r8, g8, b8, a8 uint8
 			var gxR, gxG, gxB, gyR, gyG, gyB int
@@ -27,12 +30,7 @@ func serialSobel(img *image.RGBA) {
 					deltaX := x + kx
 					deltaY := y + ky
 
-					// If the current neighbor is outside of the image, jump to next iteration
-					if !isPositionWithinImage(img, deltaX, deltaY) {
-						continue
-					}
-
-					r8, g8, b8, a8 = utils.GetRGBA8(&originalImg, deltaX, deltaY)
+					r8, g8, b8, a8 = utils.GetRGBA8(&copyImg, deltaX, deltaY)
 					r := int(r8)
 					g := int(g8)
 					b := int(b8)

@@ -1,8 +1,9 @@
 package sobel
 
-import "image"
-
 var (
+	// The padding (in pixels) to be added to each side of a image's partition copy.
+	copyPadding = 1
+
 	// Sobel's convolution kernel used for computing horizontal gradients.
 	gX = [3][3]int{
 		{-1, 0, 1},
@@ -30,13 +31,4 @@ func clampColorValue(val float64) uint8 {
 	}
 
 	return uint8(val)
-}
-
-// isPositionWithinImage checks if the pixel at the specified coordinates is
-// within the boundaries of the provided image.
-func isPositionWithinImage(img *image.RGBA, x, y int) bool {
-	isWithinXBounds := (x >= img.Rect.Min.X) && (x < img.Rect.Max.X)
-	isWithinYBounds := (y >= img.Rect.Min.Y) && (y < img.Rect.Max.Y)
-
-	return isWithinXBounds && isWithinYBounds
 }

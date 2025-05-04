@@ -15,6 +15,7 @@ import (
 func serialGaussianBlur(img *image.RGBA) {
 	var (
 		bounds                       = img.Bounds()
+		sigma                        = computeKernelSigma(kernelSize)
 		gaussianKernel, kernelOffset = generateGaussianKernel(kernelSize, sigma)
 	)
 

@@ -16,6 +16,7 @@ func concurrentGaussianBlur(img *image.RGBA) {
 		bounds                       = img.Bounds()
 		numWorkers                   = imgutil.GetNumberOfWorkers(bounds)
 		imageStrips                  = imgutil.GetVerticalPartitions(bounds, numWorkers)
+		sigma                        = computeKernelSigma(kernelSize)
 		gaussianKernel, kernelOffset = generateGaussianKernel(kernelSize, sigma)
 		mainWg                       sync.WaitGroup
 		copyWg                       sync.WaitGroup

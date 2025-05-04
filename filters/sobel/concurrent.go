@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentSobel applies the sobel filter to the entire image using multiple
@@ -60,7 +59,7 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.W
 					deltaX := x + kx
 					deltaY := y + ky
 
-					r8, g8, b8, a8 = utils.GetRGBA8(&copyImg, deltaX, deltaY)
+					r8, g8, b8, a8 = imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
 					r := int(r8)
 					g := int(g8)
 					b := int(b8)

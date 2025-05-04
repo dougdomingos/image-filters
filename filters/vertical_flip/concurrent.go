@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentVerticalFlip applies the vertical flip filter to the entire image
@@ -41,7 +40,7 @@ func verticalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGr
 			topOffset := rowStartTop + (x * 4)
 			bottomOffset := rowStartBottom + (x * 4)
 
-			utils.SwapPixels(img, topOffset, bottomOffset)
+			imgutil.SwapPixels(img, topOffset, bottomOffset)
 		}
 	}
 }

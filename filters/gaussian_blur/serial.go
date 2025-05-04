@@ -4,7 +4,6 @@ import (
 	"image"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // serialGaussianBlur applies the gaussian blur filter the entire image in a
@@ -37,7 +36,7 @@ func serialGaussianBlur(img *image.RGBA) {
 						continue
 					}
 
-					r, g, b, a := utils.GetRGBA8(&copyImg, deltaX, deltaY)
+					r, g, b, a := imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
 					kernelWeight := gaussianKernel[ky+kernelOffset][kx+kernelOffset]
 
 					sumR += float64(r) * kernelWeight

@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // serialSobel applies the sobel filter to the entire image in a single pass.
@@ -31,7 +30,7 @@ func serialSobel(img *image.RGBA) {
 					deltaX := x + kx
 					deltaY := y + ky
 
-					r8, g8, b8, a8 = utils.GetRGBA8(&copyImg, deltaX, deltaY)
+					r8, g8, b8, a8 = imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
 					r := int(r8)
 					g := int(g8)
 					b := int(b8)

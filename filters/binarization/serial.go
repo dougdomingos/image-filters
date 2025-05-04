@@ -3,7 +3,7 @@ package binarization
 import (
 	"image"
 
-	"dougdomingos.com/image-filters/utils"
+	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
 // serialBinarization applies the binarization filter to the entire image in a
@@ -18,7 +18,7 @@ func serialBinarization(img *image.RGBA) {
 		rowStart := (y - img.Rect.Min.Y) * img.Stride
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			offset := rowStart + (x-img.Rect.Min.X)*4
-			intensity, _, _, _ := utils.GetRGBA8(img, x, y)
+			intensity, _, _, _ := imgutil.GetRGBA8(img, x, y)
 
 			if intensity > threshold {
 				copy(img.Pix[offset:offset+4], whitePixel[:])

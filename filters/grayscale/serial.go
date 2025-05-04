@@ -3,7 +3,7 @@ package grayscale
 import (
 	"image"
 
-	"dougdomingos.com/image-filters/utils"
+	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
 // serialGrayscale applies the grayscale filter to the entire image in a single
@@ -17,7 +17,7 @@ func serialGrayscale(img *image.RGBA) {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			offset := rowStart + (x-img.Rect.Min.X)*4
 
-			r, g, b, a := utils.GetRGBA8(img, x, y)
+			r, g, b, a := imgutil.GetRGBA8(img, x, y)
 			gray := runLumaTransform(r, g, b)
 
 			copy(img.Pix[offset:offset+4], []uint8{gray, gray, gray, a})

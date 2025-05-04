@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentBinarization applies the binarization filter to the entire image
@@ -39,7 +38,7 @@ func binarizationWorker(img *image.RGBA, bounds image.Rectangle, threshold uint8
 		rowStart := (y - img.Rect.Min.Y) * img.Stride
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			offset := rowStart + (x-img.Rect.Min.X)*4
-			intensity, _, _, _ := utils.GetRGBA8(img, x, y)
+			intensity, _, _, _ := imgutil.GetRGBA8(img, x, y)
 
 			if intensity > threshold {
 				copy(img.Pix[offset:offset+4], whitePixel[:])

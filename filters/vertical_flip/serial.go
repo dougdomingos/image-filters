@@ -3,7 +3,7 @@ package vertical_flip
 import (
 	"image"
 
-	"dougdomingos.com/image-filters/utils"
+	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
 // serialVerticalFlip applies the vertical flip filter to the entire image in a
@@ -20,7 +20,7 @@ func serialVerticalFlip(img *image.RGBA) {
 			topOffset := rowStartTop + (x * 4)
 			bottomOffset := rowStartBottom + (x * 4)
 
-			utils.SwapPixels(img, topOffset, bottomOffset)
+			imgutil.SwapPixels(img, topOffset, bottomOffset)
 		}
 	}
 }

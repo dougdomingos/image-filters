@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentGrayscale applies the grayscale filter to the entire image using
@@ -36,7 +35,7 @@ func grayscaleWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			offset := rowStart + (x-img.Rect.Min.X)*4
 
-			r, g, b, a := utils.GetRGBA8(img, x, y)
+			r, g, b, a := imgutil.GetRGBA8(img, x, y)
 			gray := runLumaTransform(r, g, b)
 
 			copy(img.Pix[offset:offset+4], []uint8{gray, gray, gray, a})

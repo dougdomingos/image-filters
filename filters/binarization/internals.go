@@ -4,7 +4,7 @@ import (
 	"image"
 	"math"
 
-	"dougdomingos.com/image-filters/utils"
+	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
 var (
@@ -33,7 +33,7 @@ func otsuThreshold(img *image.RGBA, bounds image.Rectangle) uint8 {
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			gray, _, _, _ := utils.GetRGBA8(img, x, y)
+			gray, _, _, _ := imgutil.GetRGBA8(img, x, y)
 			intensity := gray
 			histogram[intensity]++
 		}

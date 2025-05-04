@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentHorizontalFlip applies the horizontal flip filter to the entire
@@ -40,7 +39,7 @@ func horizontalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.Wait
 			leftOffset := rowStart + (bounds.Min.X+deltaX)*4
 			rightOffset := rowStart + (bounds.Max.X-1-deltaX)*4
 
-			utils.SwapPixels(img, leftOffset, rightOffset)
+			imgutil.SwapPixels(img, leftOffset, rightOffset)
 		}
 	}
 }

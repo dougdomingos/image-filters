@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
-	"dougdomingos.com/image-filters/utils"
 )
 
 // concurrentGaussianBlur applies the gaussian blur filter to the entire image
@@ -64,7 +63,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 						continue
 					}
 
-					r, g, b, a := utils.GetRGBA8(&copyImg, deltaX, deltaY)
+					r, g, b, a := imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
 					kernelWeight := kernel[ky+kernelOffset][kx+kernelOffset]
 
 					sumR += float64(r) * kernelWeight

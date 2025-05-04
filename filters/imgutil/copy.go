@@ -2,6 +2,12 @@ package imgutil
 
 import "image"
 
+// CopyPaddedImagePartition returns a new image.RGBA that represents a padded
+// copy of a specified rectangular region from the source image.
+//
+// The padding value determines how many pixels are added around the region on
+// each side. Pixels in the padded area that fall outside the original image
+// bounds are filled with opaque black (0, 0, 0, 255).
 func CopyPaddedImagePartition(img *image.RGBA, bounds image.Rectangle, padding int) image.RGBA {
 	paddedBounds := getPaddedBounds(bounds, padding)
 	paddedImg := image.NewRGBA(paddedBounds)
@@ -24,6 +30,10 @@ func CopyPaddedImagePartition(img *image.RGBA, bounds image.Rectangle, padding i
 	return *paddedImg
 }
 
+// IsPositionWithinOriginalImage determines whether the specified (x, y)
+// coordinate, adjusted by the given padding, falls within the bounds of the
+// original image. This is used to check if a padded pixel location corresponds
+// to a valid source pixel.
 func IsPositionWithinOriginalImage(img *image.RGBA, x, y, padding int) bool {
 	offsetX, offsetY := x-padding, y-padding
 
@@ -33,6 +43,10 @@ func IsPositionWithinOriginalImage(img *image.RGBA, x, y, padding int) bool {
 	return isXWithinBounds && isYWithinBounds
 }
 
+// getPaddedBounds returns a new rectangle that extends the given bounds by the
+// specified padding on all sides. If the bounds of an axis start at its origin,
+// it ensures that padding is added only in the positive direction to avoid
+// negative coordinates.
 func getPaddedBounds(bounds image.Rectangle, padding int) image.Rectangle {
 	minX, maxX := bounds.Min.X-padding, bounds.Max.X+padding
 	minY, maxY := bounds.Min.Y-padding, bounds.Max.Y+padding

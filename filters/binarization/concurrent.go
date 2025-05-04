@@ -19,7 +19,7 @@ func concurrentBinarization(img *image.RGBA) {
 		wg          sync.WaitGroup
 	)
 
-	wg.Add(len(imageStrips))
+	wg.Add(numWorkers)
 	for strip := range imageStrips {
 		go binarizationWorker(img, imageStrips[strip], threshold, &wg)
 	}

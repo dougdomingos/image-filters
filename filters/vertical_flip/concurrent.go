@@ -18,7 +18,7 @@ func concurrentVerticalFlip(img *image.RGBA) {
 		wg          sync.WaitGroup
 	)
 
-	wg.Add(len(imageStrips))
+	wg.Add(numWorkers)
 	for strip := range imageStrips {
 		go verticalFlipWorker(img, imageStrips[strip], &wg)
 	}

@@ -17,7 +17,7 @@ func concurrentGrayscale(img *image.RGBA) {
 		wg          sync.WaitGroup
 	)
 
-	wg.Add(len(imageStrips))
+	wg.Add(numWorkers)
 	for strip := range imageStrips {
 		go grayscaleWorker(img, imageStrips[strip], &wg)
 	}

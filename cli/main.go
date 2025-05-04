@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 
 	"dougdomingos.com/image-filters/engines"
@@ -45,8 +44,8 @@ func main() {
 		terminateWithError(err, FilterNotImplementedError)
 	}
 
-	imageFilename := filepath.Base(parsedFlags.ImgPath)
-	outputPath, err := SaveImage(imageRGBA, format, parsedFlags.OutputDir, imageFilename)
+	outputFile := GetProcessedImageFilename(parsedFlags.ImgPath, parsedFlags.FilterName)
+	outputPath, err := SaveImage(imageRGBA, format, parsedFlags.OutputDir, outputFile)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)
 	}

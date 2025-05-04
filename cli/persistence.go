@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // LoadImage receives the path of an image file and returns it as an RGBA image,
@@ -63,4 +64,19 @@ func CreateOutputDir(path string) error {
 	}
 
 	return err
+}
+
+// GetProcessedImageFilename takes the original image's path and the name of
+// the applied filter and returns the name of the output image file.
+// 
+// The output string is in the following format:
+// 
+// 	outputFile = [imgPathBase]-[filterName].[imgExtension]
+func GetProcessedImageFilename(imgFilepath, filterName string) string {
+	base := filepath.Base(imgFilepath)
+	ext := filepath.Ext(base)
+	name := strings.TrimSuffix(base, ext)
+	ext = strings.TrimPrefix(ext, ".")
+
+	return fmt.Sprintf("%s-%s.%s", name, filterName, ext)
 }

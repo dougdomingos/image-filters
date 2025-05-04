@@ -47,7 +47,7 @@ func serialGaussianBlur(img *image.RGBA) {
 				}
 			}
 
-			// normalize the weighted sums to mitigate loss on edghe píxels
+			// normalize the weighted sums to mitigate loss on edge píxels
 			if kernelWeightSum > 0 {
 				sumR /= kernelWeightSum
 				sumG /= kernelWeightSum

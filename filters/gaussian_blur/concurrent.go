@@ -74,7 +74,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 				}
 			}
 
-			// normalize the weighted sums to mitigate loss on edghe píxels
+			// normalize the weighted sums to mitigate loss on edge píxels
 			if kernelWeightSum > 0 {
 				sumR /= kernelWeightSum
 				sumG /= kernelWeightSum

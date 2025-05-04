@@ -7,9 +7,14 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// serialGaussianBlur applies the gaussian blur filter the entire image in a
+// single pass. It creates a padded copy of the image, based on the gaussian
+// kernel's offset, then computes the weighted colors of each pixel based on
+// its neighbors. The results are normalized to minimize calculation errors
+// on edge pixels.
 func serialGaussianBlur(img *image.RGBA) {
 	var (
-		bounds                      = img.Bounds()
+		bounds                       = img.Bounds()
 		gaussianKernel, kernelOffset = generateGaussianKernel(kernelSize, sigma)
 	)
 
@@ -26,6 +31,7 @@ func serialGaussianBlur(img *image.RGBA) {
 				for kx := -kernelOffset; kx <= kernelOffset; kx++ {
 					deltaX, deltaY := x+kx, y+ky
 
+					// disconsider padding pixels from blurring calculations
 					if !imgutil.IsPositionWithinOriginalImage(img, deltaX, deltaY, kernelOffset) {
 						continue
 					}
@@ -41,6 +47,7 @@ func serialGaussianBlur(img *image.RGBA) {
 				}
 			}
 
+			// normalize the weighted sums to mitigate loss on edghe píxels
 			if kernelWeightSum > 0 {
 				sumR /= kernelWeightSum
 				sumG /= kernelWeightSum

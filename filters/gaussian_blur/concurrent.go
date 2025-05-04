@@ -8,6 +8,9 @@ import (
 	"dougdomingos.com/image-filters/utils"
 )
 
+// concurrentGaussianBlur applies the gaussian blur filter to the entire image
+// using multiple goroutines. It computes the global gaussian kernel to be used
+// by all workers.
 func concurrentGaussianBlur(img *image.RGBA) {
 	var (
 		bounds                       = img.Bounds()
@@ -27,6 +30,11 @@ func concurrentGaussianBlur(img *image.RGBA) {
 	mainWg.Wait()
 }
 
+// gaussianBlurWorker process a subregion of the image by creating a padded
+// copy of the subregion and using it to compute the weighted color values for
+// each pixel within the partition. It ensures that no worker goroutine edits
+// certain parts of the original image before the others have finished their
+// copy stage.
 func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]float64, kernelOffset int, mainWg, copyWg *sync.WaitGroup) {
 	defer mainWg.Done()
 	copyImg := func() image.RGBA {
@@ -36,6 +44,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 
 	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+kernelOffset, copyImg.Rect.Max.X-kernelOffset
 	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+kernelOffset, copyImg.Rect.Max.Y-kernelOffset
+
 	for y := paddedMinY; y < paddedMaxY; y++ {
 		srcRowStart := (y - kernelOffset) * img.Stride
 		for x := paddedMinX; x < paddedMaxX; x++ {
@@ -49,6 +58,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 				for kx := -kernelOffset; kx <= kernelOffset; kx++ {
 					deltaX, deltaY := x+kx, y+ky
 
+					// disconsider padding pixels from blurring calculations
 					if !imgutil.IsPositionWithinOriginalImage(img, deltaX, deltaY, kernelOffset) {
 						continue
 					}
@@ -64,6 +74,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 				}
 			}
 
+			// normalize the weighted sums to mitigate loss on edghe píxels
 			if kernelWeightSum > 0 {
 				sumR /= kernelWeightSum
 				sumG /= kernelWeightSum

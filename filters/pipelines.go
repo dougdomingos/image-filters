@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"dougdomingos.com/image-filters/filters/binarization"
+	"dougdomingos.com/image-filters/filters/gaussian_blur"
 	"dougdomingos.com/image-filters/filters/grayscale"
 	"dougdomingos.com/image-filters/filters/horizontal_flip"
 	"dougdomingos.com/image-filters/filters/sobel"
@@ -20,6 +21,7 @@ var AvaliableFilters = map[string]types.FilterPipeline{
 	"sobel":            sobel.SobelPipeline,
 	"sobel-grayscaled": sobel.SobelGrayscaledPipeline,
 	"vertical-flip":    vertical_flip.VerticalFlipPipeline,
+	"gaussian-blur":    gaussian_blur.GaussianBlurPipeline,
 	// add more filters here...
 }
 

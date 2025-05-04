@@ -11,9 +11,11 @@ CONCURRENT_FLAG := $(if $(CONCURRENT), --concurrent)
 OUT_DIR = ./output
 IMG_SIZE = 5000
 
-
 run:   ## Run the CLI with args (e.g. make run IMG=img.jpg FILTER=grayscale MODE=serial)
 	go run $(CLI_PATH) -img $(IMG) -outDir $(OUT_DIR) -filter $(FILTER) $(CONCURRENT_FLAG)
+
+list:  ## List the avaliable filter pipelines
+	go run $(CLI_PATH) --list
 
 bench: ## Run a benchmark of a specific filter in both serial and concurrent modes
 	go test -bench=. -run=^$$ -benchmem ./engines -args -filter $(FILTER) -imageSize $(IMG_SIZE)

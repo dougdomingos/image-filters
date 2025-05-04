@@ -6,18 +6,17 @@ import (
 
 	"dougdomingos.com/image-filters/engines"
 	"dougdomingos.com/image-filters/filters"
-	"dougdomingos.com/image-filters/utils"
 )
 
 func main() {
 	parsedFlags := parseInputFlags()
 	
-	imageRGBA, format, err := utils.LoadImage(parsedFlags.ImgPath)
+	imageRGBA, format, err := LoadImage(parsedFlags.ImgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
 	}
 	
-	err = utils.CreateOutputDir(parsedFlags.OutputDir)
+	err = CreateOutputDir(parsedFlags.OutputDir)
 	if err != nil {
 		terminateWithError(err, OutputDirError)
 	}
@@ -33,7 +32,7 @@ func main() {
 	}
 
 	imageFilename := filepath.Base(parsedFlags.ImgPath)
-	outputPath, err := utils.SaveImage(imageRGBA, format, parsedFlags.OutputDir, imageFilename)
+	outputPath, err := SaveImage(imageRGBA, format, parsedFlags.OutputDir, imageFilename)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)
 	}

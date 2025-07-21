@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-// LoadImage receives the path of an image file and returns it as an RGBA image,
+// loadImage receives the path of an image file and returns it as an RGBA image,
 // along with its original format (e.g., "jpeg", "png").
-func LoadImage(filePath string) (*image.RGBA, string, error) {
+func loadImage(filePath string) (*image.RGBA, string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, "", fmt.Errorf("[ERROR] Unable to load %s: %w", filePath, err)
@@ -32,10 +32,10 @@ func LoadImage(filePath string) (*image.RGBA, string, error) {
 	return rgba, format, nil
 }
 
-// SaveImage takes a RGBA image, its original encoding format and the path in
+// saveImage takes a RGBA image, its original encoding format and the path in
 // which it'll be stored and creates a new file containing the specified image
 // at that path.
-func SaveImage(img *image.RGBA, format string, outputDir string, outputFile string) (string, error) {
+func saveImage(img *image.RGBA, format string, outputDir string, outputFile string) (string, error) {
 	outputPath := filepath.Join(outputDir, outputFile)
 	file, err := os.Create(outputPath)
 	if err != nil {
@@ -55,9 +55,9 @@ func SaveImage(img *image.RGBA, format string, outputDir string, outputFile stri
 	return outputPath, err
 }
 
-// CreateOutputDir checks if a directory exists at the given path, and creates
+// createOutputDir checks if a directory exists at the given path, and creates
 // it (with parents) if it doesn't.
-func CreateOutputDir(path string) error {
+func createOutputDir(path string) error {
 	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("[ERROR]: Creating output directory failed! %s", err)
@@ -66,13 +66,13 @@ func CreateOutputDir(path string) error {
 	return err
 }
 
-// GetProcessedImageFilename takes the original image's path and the name of
+// getProcessedImageFilename takes the original image's path and the name of
 // the applied filter and returns the name of the output image file.
 // 
 // The output string is in the following format:
 // 
 // 	outputFile = [imgPathBase]-[filterName].[imgExtension]
-func GetProcessedImageFilename(imgFilepath, filterName string) string {
+func getProcessedImageFilename(imgFilepath, filterName string) string {
 	base := filepath.Base(imgFilepath)
 	ext := filepath.Ext(base)
 	name := strings.TrimSuffix(base, ext)

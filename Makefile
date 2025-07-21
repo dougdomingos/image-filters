@@ -3,7 +3,7 @@
 # Directories and files
 DIST_DIR = ./bin
 BIN_FILE = image-filters
-CLI_PATH = ./cli
+CLI_PATH = ./cmd/cli
 
 # Parameters
 CONCURRENT ?=

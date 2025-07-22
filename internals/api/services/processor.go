@@ -1,7 +1,6 @@
-package api
+package services
 
 import (
-	"fmt"
 	"image"
 	"net/http"
 
@@ -9,11 +8,8 @@ import (
 	"dougdomingos.com/image-filters/filters"
 )
 
-func benchmarkHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Benchmark route accessed")
-}
 
-func processorHandler(w http.ResponseWriter, r *http.Request) {
+func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		http.Error(w, "Request is too large or malformed", http.StatusBadRequest)

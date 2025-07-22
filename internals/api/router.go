@@ -4,13 +4,14 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"dougdomingos.com/image-filters/internals/api/services"
 )
 
 func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/process", processorHandler)
-	mux.HandleFunc("/bench", benchmarkHandler)
+	mux.HandleFunc("/process", services.ProcessorHandler)
+	mux.HandleFunc("/bench", services.BenchmarkHandler)
 
 	return mux
 }

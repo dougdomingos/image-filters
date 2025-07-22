@@ -3,8 +3,6 @@ package api
 import (
 	"fmt"
 	"image"
-	"image/draw"
-	"image/png"
 	"net/http"
 
 	"dougdomingos.com/image-filters/engines"
@@ -42,21 +40,15 @@ func processorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, _, err := image.Decode(file)
+	img, format, err := image.Decode(file)
 	if err != nil {
 		http.Error(w, "Image format is not supported", http.StatusBadRequest)
 		return
 	}
 
-	// TODO: check if format conversion is necessary for all image formats
-	bounds := img.Bounds()
-	rgbaImage := image.NewRGBA(bounds)
-	draw.Draw(rgbaImage, bounds, img, bounds.Min, draw.Src)
+	rgbaImage := convertImageToRGBA(img)
 
 	// TODO: allow users to select serial or concurrent execution modes
 	engines.ApplyFilterPipeline(rgbaImage, &filter, false)
-
-	// TODO: detect image original encoding
-	w.Header().Set("Content-Type", "image/png")
-	png.Encode(w, rgbaImage)
+	encodeResponseImage(w, rgbaImage, format)
 }

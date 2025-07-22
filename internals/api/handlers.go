@@ -28,7 +28,7 @@ func processorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	filterName := r.FormValue("filter")
+	filterName := r.URL.Query().Get("filter")
 	if filterName == "" {
 		http.Error(w, "Filter was not provided", http.StatusBadRequest)
 		return
@@ -45,10 +45,13 @@ func processorHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Image format is not supported", http.StatusBadRequest)
 		return
 	}
-
+	
+	isConcurrent := false
+	if c := r.URL.Query().Get("concurrent"); c == "true" {
+		isConcurrent = true
+	}
+	
 	rgbaImage := convertImageToRGBA(img)
-
-	// TODO: allow users to select serial or concurrent execution modes
-	engines.ApplyFilterPipeline(rgbaImage, &filter, false)
+	engines.ApplyFilterPipeline(rgbaImage, &filter, isConcurrent)
 	encodeResponseImage(w, rgbaImage, format)
 }

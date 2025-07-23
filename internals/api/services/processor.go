@@ -1,53 +1,66 @@
 package services
 
 import (
+	"errors"
 	"image"
 	"net/http"
 
 	"dougdomingos.com/image-filters/engines"
 	"dougdomingos.com/image-filters/filters"
+	"dougdomingos.com/image-filters/internals/api/dto"
 )
 
-
 func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		http.Error(w, "Request is too large or malformed", http.StatusBadRequest)
-		return
+	requestData, statusCode, errorMsg := parseProcessorRequest(r)
+	if statusCode != http.StatusOK {
+		http.Error(w, errorMsg, statusCode)
 	}
 
-	// TODO: abstract validation logic into external function
+	rgbaImage := convertImageToRGBA(requestData.Img)
+	engines.ApplyFilterPipeline(rgbaImage, &requestData.Pipeline, requestData.IsConcurrent)
+	encodeResponseImage(w, rgbaImage, requestData.ImgFormat)
+}
+
+func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, string) {
+	err := r.ParseMultipartForm(15 << 20)
+	if err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return nil, http.StatusRequestEntityTooLarge, "Request body is too large"
+		}
+		return nil, http.StatusBadRequest, "Malformed multipart/form-data request"
+	}
+
 	file, _, err := r.FormFile("image")
 	if err != nil {
-		http.Error(w, "Image was not provided", http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, "No image provided"
 	}
 	defer file.Close()
 
 	filterName := r.URL.Query().Get("filter")
 	if filterName == "" {
-		http.Error(w, "Filter was not provided", http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, "Parameter \"filter\" is required"
 	}
 
 	filter, err := filters.GetFilterPipeline(filterName)
 	if err != nil {
-		http.Error(w, "Requested filter does not exist", http.StatusNotFound)
-		return
+		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}
 
 	img, format, err := image.Decode(file)
 	if err != nil {
-		http.Error(w, "Image format is not supported", http.StatusBadRequest)
-		return
+		return nil, http.StatusBadRequest, "Image format is not supported"
 	}
-	
+
 	isConcurrent := false
 	if c := r.URL.Query().Get("concurrent"); c == "true" {
 		isConcurrent = true
 	}
-	
-	rgbaImage := convertImageToRGBA(img)
-	engines.ApplyFilterPipeline(rgbaImage, &filter, isConcurrent)
-	encodeResponseImage(w, rgbaImage, format)
+
+	return &dto.ProcessorRequestDTO{
+		Img:          img,
+		ImgFormat:    format,
+		Pipeline:     filter,
+		IsConcurrent: isConcurrent,
+	}, http.StatusOK, ""
 }

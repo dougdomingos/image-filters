@@ -14,6 +14,8 @@ import (
 	"dougdomingos.com/image-filters/internals/api/dto"
 )
 
+// BenchmarkHandler provides the benchmark service to the API. It receives the
+// filter and a size for the test image through URL parameters.
 func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	requestData, statusCode, errorMsg := parseBenchmarkRequest(r)
 	if statusCode != http.StatusOK {
@@ -33,6 +35,9 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// parseBenchmarkRequest extract and validates parameters from the HTTP request
+// intended for the benchmark service. It ensures the presence of required
+// fields, and converts values as required.
 func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, string) {
 	filterName := r.URL.Query().Get("filter")
 	if filterName == "" {
@@ -59,6 +64,9 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 	}, http.StatusOK, ""
 }
 
+// benchmarkPipeline applies a filter pipeline to an image and returns the
+// processing duration in milliseconds. The caller may specify if the pipeline
+// should run concurrently or not.
 func benchmarkPipeline(pipeline types.FilterPipeline, img image.RGBA, concurrentMode bool) int64 {
 	start := time.Now()
 	engines.ApplyFilterPipeline(&img, &pipeline, concurrentMode)

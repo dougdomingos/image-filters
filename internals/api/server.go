@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// StartHTTPServer initiates the API HTTP server with the specified routes.
+// By default, the server listens to port 8080.
 func StartHTTPServer() {
 	router := withRequestLogger(buildRouter())
 

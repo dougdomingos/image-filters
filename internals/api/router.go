@@ -10,6 +10,8 @@ import (
 	"dougdomingos.com/image-filters/internals/api/services"
 )
 
+// buildRouter creates and configures a ServeMux with the handlers for each
+// route avaliable on the API.
 func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
@@ -19,9 +21,12 @@ func buildRouter() *http.ServeMux {
 	return mux
 }
 
+// withRequestLogger acts as a middleware handler that captures requests to the
+// API and logs basic information for each one (e.g., requested route, URL
+// params).
 func withRequestLogger(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        timestamp := time.Now().Format(time.RFC3339)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		timestamp := time.Now().Format(time.RFC3339)
 		route := r.URL.Path
 
 		queryParams := r.URL.Query()
@@ -39,5 +44,5 @@ func withRequestLogger(next http.Handler) http.Handler {
 
 		log.Printf("[%s] Request to %s%s", timestamp, route, paramStr)
 		next.ServeHTTP(w, r)
-    })
+	})
 }

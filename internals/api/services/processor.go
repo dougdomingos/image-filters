@@ -10,6 +10,9 @@ import (
 	"dougdomingos.com/image-filters/internals/api/dto"
 )
 
+// ProcessorHandler provides the image processing service to the API. It
+// accepts an image through a multipart/form-data request. The filter
+// and execution mode are specified through URL parameters. 
 func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	requestData, statusCode, errorMsg := parseProcessorRequest(r)
 	if statusCode != http.StatusOK {
@@ -21,6 +24,9 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	encodeResponseImage(w, rgbaImage, requestData.ImgFormat)
 }
 
+// parseProcessorRequest extracts and validates the required parameters from the
+// HTTP request intended for the processor service. It enforces constraints on
+// request size (max. 15 MB), required fields, and image format.
 func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, string) {
 	err := r.ParseMultipartForm(15 << 20)
 	if err != nil {

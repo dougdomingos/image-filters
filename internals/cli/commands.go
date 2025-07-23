@@ -6,6 +6,7 @@ import (
 
 	"dougdomingos.com/image-filters/engines"
 	"dougdomingos.com/image-filters/filters"
+	"dougdomingos.com/image-filters/internals/utils"
 )
 
 // ListAvaliablePipelines displays the list of all avaliable pipelines.
@@ -28,12 +29,12 @@ func ListAvaliablePipelines() {
 // pipeline to it and store the result image into the specified output
 // directory. It also allows the selection of the execution mode.
 func ApplyPipelineToImage(imgPath, outputDir, pipelineID string, isConcurrent bool) {
-	imageRGBA, format, err := loadImage(imgPath)
+	imageRGBA, format, err := utils.LoadImage(imgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
 	}
 
-	err = createOutputDir(outputDir)
+	err = utils.CreateOutputDir(outputDir)
 	if err != nil {
 		terminateWithError(err, OutputDirError)
 	}
@@ -48,8 +49,8 @@ func ApplyPipelineToImage(imgPath, outputDir, pipelineID string, isConcurrent bo
 		terminateWithError(err, FilterNotImplementedError)
 	}
 
-	outputFile := getProcessedImageFilename(imgPath, pipelineID)
-	outputPath, err := saveImage(imageRGBA, format, outputDir, outputFile)
+	outputFile := utils.GetProcessedImageFilename(imgPath, pipelineID)
+	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, outputFile)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)
 	}

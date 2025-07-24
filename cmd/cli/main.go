@@ -8,6 +8,6 @@ func main() {
 	if flags.ListPipelines {
 		cli.ListAvaliablePipelines()
 	} else {
-		cli.ApplyPipelineToImage(flags.ImgPath, flags.OutputDir, flags.FilterName, flags.IsConcurrent)
+		cli.ApplyPipelineToImage(flags.ImgPath, flags.OutputDir, flags.FilterName)
 	}
 }

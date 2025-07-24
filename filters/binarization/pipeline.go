@@ -17,7 +17,7 @@ import (
 // BinarizationPipeline defines the binarization filter pipeline. Since
 // binarization works best on grayscaled image, it uses the GrayscalePipeline
 // as a preprocessing step.
-var BinarizationPipeline = filters.FilterPipeline{
+var BinarizationPipeline = filters.Action{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Binarization,
 }

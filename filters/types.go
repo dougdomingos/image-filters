@@ -9,14 +9,7 @@ import "image"
 // by default.
 type Filter func(image *image.RGBA)
 
-// FilterPipeline defines a configurable image processing pipeline, consisting
-// of an optional preprocessing stage and the core filter algorithm.
-type FilterPipeline struct {
-
-	// Preprocess is an optional step executed before the main filter,
-	// enabling recursive chaining of operations. If nil, no preprocessing is
-	// performed.
+type Action struct {
 	Preprocess Filter
-
 	Filter Filter
 }

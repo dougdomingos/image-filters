@@ -13,11 +13,11 @@ type BenchmarkRequestDTO struct {
 
 	// FilterPipeline is the requested filter pipeline that matches the
 	// "filter" parameter from the request.
-	FilterPipeline filters.FilterPipeline
+	FilterPipeline filters.Action
 
 	// TestImageSize is the requested dimensions for the dummy image to be used
 	// on the benchmark tests.
-	TestImageSize  int
+	TestImageSize int
 }
 
 // BenchmarkResponseDTO represents the JSON for benchmark HTTP responses.

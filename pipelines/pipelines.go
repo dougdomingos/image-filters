@@ -14,7 +14,7 @@ import (
 
 // AvailableFilters maps a string identifier to its corresponding filter
 // pipeline.
-var AvaliableFilters = map[string]filters.FilterPipeline{
+var AvaliableFilters = map[string]filters.Action{
 	"binarization":     binarization.BinarizationPipeline,
 	"grayscale":        grayscale.GrayscalePipeline,
 	"horizontal-flip":  horizontal_flip.HorizontalFlipPipeline,
@@ -28,10 +28,10 @@ var AvaliableFilters = map[string]filters.FilterPipeline{
 // GetFilterPipeline retrieves a filter pipeline by its name from the
 // AvailableFilters map. It returns the pipeline if found, or an error if the
 // specified name is not defined.
-func GetFilterPipeline(filterName string) (filters.FilterPipeline, error) {
+func GetFilterPipeline(filterName string) (filters.Action, error) {
 	pipeline, exists := AvaliableFilters[filterName]
 	if !exists {
-		return filters.FilterPipeline{}, fmt.Errorf("[ERROR]: Specified filter does not exist")
+		return filters.Action{}, fmt.Errorf("[ERROR]: Specified filter does not exist")
 	}
 
 	return pipeline, nil

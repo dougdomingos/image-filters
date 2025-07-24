@@ -6,31 +6,16 @@ import (
 	"dougdomingos.com/image-filters/filters"
 )
 
-// ProcessorNode represents a single filter pipeline in a processor queue. It
-// may point to a subsequent pipeline in the queue, or nil if it's the last
-// one.
-type ProcessNode struct {
-
-	// Pipeline holds the filter pipeline to be applied to the image.
-	Pipeline *filters.FilterPipeline
-
-	// Next points to the next pipeline in the queue, or nil if there isn't
-	// one.
-	Next *ProcessNode
+type Step struct {
+	Action *filters.Action
+	Next *Step
 }
 
-// ProcessorQueue represents a sequence of filter pipelines to be applied to a
-// image.
-type ProcessQueue struct {
-
-	// head points to the first pipeline to be applied to the image.
-	head *ProcessNode
+type Recipe struct {
+	head *Step
 }
 
-// GetNode returns the next ProcessorNode to be executed by the filter engine.
-// It does not preserves the current head of the queue, as ProcessQueues are
-// discarded once all nodes are consumed.
-func (procQueue *ProcessQueue) GetNode() *ProcessNode {
+func (procQueue *Recipe) NextStep() *Step {
 	if procQueue.head == nil {
 		return nil
 	}
@@ -40,19 +25,16 @@ func (procQueue *ProcessQueue) GetNode() *ProcessNode {
 	return currentHead
 }
 
-// BuildProcessQueue creates a ProcessQueue containing one ProcessorNode for
-// each requested filter. If a requested filter does not exist, the queue is
-// discarded.
-func BuildProcessQueue(filterIDs []string) (ProcessQueue, error) {
-	var head, tail *ProcessNode
+func BuildRecipe(filterIDs []string) (Recipe, error) {
+	var head, tail *Step
 
 	for _, id := range filterIDs {
 		pipeline, err := GetFilterPipeline(id)
 		if err != nil {
-			return ProcessQueue{}, fmt.Errorf("[ERROR] No pipeline found for filter \"%q\"", id)
+			return Recipe{}, fmt.Errorf("[ERROR] No pipeline found for filter \"%q\"", id)
 		}
 
-		node := &ProcessNode{Pipeline: &pipeline}
+		node := &Step{Action: &pipeline}
 
 		if head == nil {
 			head = node
@@ -63,5 +45,5 @@ func BuildProcessQueue(filterIDs []string) (ProcessQueue, error) {
 		}
 	}
 
-	return ProcessQueue{head: head}, nil
+	return Recipe{head: head}, nil
 }

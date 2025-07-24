@@ -8,7 +8,7 @@ import (
 
 // ApplyFilterPipeline handles the execution of a filter pipeline, applying the
 // preprocess filter (if present) and then the core filter implementation.
-func ApplyFilterPipeline(img *image.RGBA, pipeline *filters.FilterPipeline) {
+func ApplyFilterPipeline(img *image.RGBA, pipeline *filters.Action) {
 	if pipeline.Preprocess != nil {
 		pipeline.Preprocess(img)
 	}

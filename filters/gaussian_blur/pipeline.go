@@ -12,7 +12,7 @@ import "dougdomingos.com/image-filters/filters"
 // GaussianBlurPipeline defines the Gaussian blur filter pipeline. As this
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
-var GaussianBlurPipeline = filters.FilterPipeline{
+var GaussianBlurPipeline = filters.Action{
 	Preprocess: nil,
 	Filter:     GaussianBlur,
 }

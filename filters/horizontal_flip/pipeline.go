@@ -11,7 +11,7 @@ import (
 // HorizontalFlipPipeline defines the horizontal flip filter pipeline. As this
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
-var HorizontalFlipPipeline = filters.FilterPipeline{
+var HorizontalFlipPipeline = filters.Action{
 	Preprocess: nil,
 	Filter:     HorizontalFlip,
 }

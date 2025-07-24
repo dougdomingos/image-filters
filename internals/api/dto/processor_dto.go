@@ -26,7 +26,7 @@ type ProcessorRequestDTO struct {
 
 	// Pipeline is the requested filter pipeline that matches the "filter"
 	// parameter from the request.
-	Pipeline filters.FilterPipeline
+	Pipeline filters.Action
 }
 
 // ProcessorResponseDTO represents the JSON for processor HTTP responses.

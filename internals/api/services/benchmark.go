@@ -67,7 +67,7 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 // benchmarkPipeline applies a filter pipeline to an image and returns the
 // processing duration in milliseconds. The caller may specify if the pipeline
 // should run concurrently or not.
-func benchmarkPipeline(pipeline filters.FilterPipeline, img image.RGBA) int64 {
+func benchmarkPipeline(pipeline filters.Action, img image.RGBA) int64 {
 	start := time.Now()
 	engines.ApplyFilterPipeline(&img, &pipeline)
 	duration := time.Since(start)

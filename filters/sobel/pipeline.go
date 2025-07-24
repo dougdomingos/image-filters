@@ -15,7 +15,7 @@ import (
 // SobelPipeline defines the sobel filter pipeline. As Sobel's Operator does
 // not require any preprocessing to detect edges within a image, no
 // preprocessing step is declared.
-var SobelPipeline = filters.FilterPipeline{
+var SobelPipeline = filters.Action{
 	Preprocess: nil,
 	Filter:     Sobel,
 }
@@ -26,7 +26,7 @@ var SobelPipeline = filters.FilterPipeline{
 // channel, but not the other). As such, its results can be improved by using
 // grayscaled images, which would only account variations on brightness and
 // intensity.
-var SobelGrayscaledPipeline = filters.FilterPipeline{
+var SobelGrayscaledPipeline = filters.Action{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Sobel,
 }

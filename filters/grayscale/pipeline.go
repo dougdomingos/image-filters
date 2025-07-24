@@ -12,7 +12,7 @@ import (
 
 // GrayscalePipeline defines the grayscale filter pipeline. Grayscale does not
 // require any preprocessing pipeline, and so, no preprocess step is declared.
-var GrayscalePipeline = filters.FilterPipeline{
+var GrayscalePipeline = filters.Action{
 	Preprocess: nil,
 	Filter:     Grayscale,
 }

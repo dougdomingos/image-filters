@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"dougdomingos.com/image-filters/engines"
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/internals/api/dto"
 	"dougdomingos.com/image-filters/internals/utils"
+	"dougdomingos.com/image-filters/pipelines"
 )
 
 // ProcessorHandler provides the image processing service to the API. It
@@ -65,7 +65,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"filter\" is required"
 	}
 
-	filter, err := filters.GetFilterPipeline(filterName)
+	filter, err := pipelines.GetFilterPipeline(filterName)
 	if err != nil {
 		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}

@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"dougdomingos.com/image-filters/engines"
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/filters/types"
 	"dougdomingos.com/image-filters/internals/api/dto"
+	"dougdomingos.com/image-filters/pipelines"
 )
 
 // BenchmarkHandler provides the benchmark service to the API. It receives the
@@ -53,7 +53,7 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"sample-size\" must be numeric"
 	}
 
-	pipeline, err := filters.GetFilterPipeline(filterName)
+	pipeline, err := pipelines.GetFilterPipeline(filterName)
 	if err != nil {
 		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filterName)
 	}

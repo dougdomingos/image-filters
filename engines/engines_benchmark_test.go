@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"dougdomingos.com/image-filters/engines"
-	"dougdomingos.com/image-filters/filters"
+	"dougdomingos.com/image-filters/pipelines"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 // the serial execution multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteSerial(b *testing.B) {
 	img := generateDummyImage(*imageSize)
-	pipeline, err := filters.GetFilterPipeline(*filterName)
+	pipeline, err := pipelines.GetFilterPipeline(*filterName)
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
@@ -43,7 +43,7 @@ func BenchmarkExecuteSerial(b *testing.B) {
 // multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteConcurrent(b *testing.B) {
 	img := generateDummyImage(*imageSize)
-	pipeline, err := filters.GetFilterPipeline(*filterName)
+	pipeline, err := pipelines.GetFilterPipeline(*filterName)
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}

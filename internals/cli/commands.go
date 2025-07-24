@@ -5,15 +5,15 @@ import (
 	"sort"
 
 	"dougdomingos.com/image-filters/engines"
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/internals/utils"
+	"dougdomingos.com/image-filters/pipelines"
 )
 
 // ListAvaliablePipelines displays the list of all avaliable pipelines.
 func ListAvaliablePipelines() {
-	pipelineIDs := make([]string, 0, len(filters.AvaliableFilters))
+	pipelineIDs := make([]string, 0, len(pipelines.AvaliableFilters))
 
-	for filterKey := range filters.AvaliableFilters {
+	for filterKey := range pipelines.AvaliableFilters {
 		pipelineIDs = append(pipelineIDs, filterKey)
 	}
 
@@ -39,7 +39,7 @@ func ApplyPipelineToImage(imgPath, outputDir, pipelineID string, isConcurrent bo
 		terminateWithError(err, OutputDirError)
 	}
 
-	pipeline, err := filters.GetFilterPipeline(pipelineID)
+	pipeline, err := pipelines.GetFilterPipeline(pipelineID)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}

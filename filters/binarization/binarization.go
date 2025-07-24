@@ -7,10 +7,10 @@ import (
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// concurrentBinarization applies the binarization filter to the entire image
+// Binarization applies the binarization filter to the entire image
 // using multiple goroutines. It first computes Otsu's global threshold,
 // then partitions the image and processes each partition concurrently.
-func concurrentBinarization(img *image.RGBA) {
+func Binarization(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)

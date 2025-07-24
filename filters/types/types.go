@@ -4,26 +4,19 @@ package types
 
 import "image"
 
-// Filter represents a function that applies a specific image processing
-// operation. The operation is performed in-place, modifying the input image
-// directly to reduce memory overhead by avoiding unnecessary copies.
+// Filter is a function that applies a specific effect to the provided image.
+// All pixel operations are done in-place, and implementations are thread-safe
+// by default.
 type Filter func(image *image.RGBA)
 
 // FilterPipeline defines a configurable image processing pipeline, consisting
-// of an optional preprocessing stage and two implementations of the main
-// filter algorithm: serial and concurrent.
-//
-// The pipeline supports recursive composition, allowing complex operations
-// to be built by chaining simpler FilterPipeline instances.
+// of an optional preprocessing stage and the core filter algorithm.
 type FilterPipeline struct {
 
 	// Preprocess is an optional step executed before the main filter,
 	// enabling recursive chaining of operations. If nil, no preprocessing is
 	// performed.
-	Preprocess *FilterPipeline
+	Preprocess Filter
 
-	// Filter is a thread-safe implementation of the filter algorithm. It
-	// splits the image into different partitions and processes them
-	// independently.
 	Filter Filter
 }

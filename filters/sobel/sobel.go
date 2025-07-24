@@ -3,16 +3,41 @@ package sobel
 import (
 	"image"
 	"math"
+	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// serialSobel applies the sobel filter to the entire image in a single pass.
-// It creates a full copy of the original image, using it to calculate the
-// color channel gradients for each pixel of the image.
-func serialSobel(img *image.RGBA) {
-	bounds := img.Bounds()
-	copyImg := imgutil.CopyPaddedImagePartition(img, bounds, copyPadding)
+// Sobel applies the Sobel filter to the entire image using multiple
+// goroutines. It makes a full copy of the image, which is shared amongst the
+// routines, which then modify their respective partitions.
+func Sobel(img *image.RGBA) {
+	var (
+		bounds      = img.Bounds()
+		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
+		imageStrips = imgutil.GetVerticalPartitions(bounds, numWorkers)
+		mainWg      sync.WaitGroup
+		copyWg      sync.WaitGroup
+	)
+
+	mainWg.Add(numWorkers)
+	copyWg.Add(numWorkers)
+	for strip := range imageStrips {
+		go sobelWorker(img, imageStrips[strip], &mainWg, &copyWg)
+	}
+
+	mainWg.Wait()
+}
+
+// sobelWorker processes a subregion of the image by applying the sobel filter
+// based on a global copy of the original image, which is used to compute the
+// gradients of each color channel.
+func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.WaitGroup) {
+	defer mainWg.Done()
+	copyImg := func() image.RGBA {
+		defer copyWg.Done()
+		return imgutil.CopyPaddedImagePartition(img, bounds, copyPadding)
+	}()
 
 	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
 	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding
@@ -20,6 +45,10 @@ func serialSobel(img *image.RGBA) {
 	for y := paddedMinY; y < paddedMaxY; y++ {
 		srcRowStart := (y - copyPadding) * img.Stride
 		for x := paddedMinX; x < paddedMaxX; x++ {
+			if x == paddedMaxX-copyPadding {
+				copyWg.Wait()
+			}
+
 			offset := srcRowStart + (x-copyPadding)*4
 
 			var r8, g8, b8, a8 uint8

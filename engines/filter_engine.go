@@ -10,21 +10,10 @@ import (
 // preprocessing steps recursively (if needed) and selecting the filter
 // implementation to be executed.
 func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConcurrent bool) error {
-	preprocess := pipeline.Preprocess
-
-	if preprocess != nil {
-		ApplyFilterPipeline(img, preprocess, isConcurrent)
+	if pipeline.Preprocess != nil {
+		pipeline.Preprocess(img)
 	}
 
 	pipeline.Filter(img)
 	return nil
 }
-
-// getFilterFromPipeline returns the filter function that corresponds to the
-// selected execution mode (either serial or concurrent).
-// func getFilterFromPipeline(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
-// 	if isConcurrent {
-// 		return pipeline.Filter
-// 	}
-// 	return pipeline.SerialFilter
-// }

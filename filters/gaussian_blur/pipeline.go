@@ -13,6 +13,6 @@ import "dougdomingos.com/image-filters/filters/types"
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
 var GaussianBlurPipeline = types.FilterPipeline{
-	Preprocess:   nil,
-	Filter:       concurrentGaussianBlur,
+	Preprocess: nil,
+	Filter:     GaussianBlur,
 }

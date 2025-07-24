@@ -16,8 +16,8 @@ import (
 // not require any preprocessing to detect edges within a image, no
 // preprocessing step is declared.
 var SobelPipeline = types.FilterPipeline{
-	Preprocess:   nil,
-	Filter:       concurrentSobel,
+	Preprocess: nil,
+	Filter:     Sobel,
 }
 
 // SobelGrayscaledPipeline defines the sobel filter pipeline with a grayscale
@@ -27,6 +27,6 @@ var SobelPipeline = types.FilterPipeline{
 // grayscaled images, which would only account variations on brightness and
 // intensity.
 var SobelGrayscaledPipeline = types.FilterPipeline{
-	Preprocess:   &grayscale.GrayscalePipeline,
-	Filter:       concurrentSobel,
+	Preprocess: grayscale.Grayscale,
+	Filter:     Sobel,
 }

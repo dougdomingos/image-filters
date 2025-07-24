@@ -7,10 +7,10 @@ import (
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// concurrentGaussianBlur applies the gaussian blur filter to the entire image
+// GaussianBlur applies the gaussian blur filter to the entire image
 // using multiple goroutines. It computes the global gaussian kernel to be used
 // by all workers.
-func concurrentGaussianBlur(img *image.RGBA) {
+func GaussianBlur(img *image.RGBA) {
 	var (
 		bounds                       = img.Bounds()
 		numWorkers                   = imgutil.GetNumberOfWorkers(bounds)

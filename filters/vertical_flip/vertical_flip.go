@@ -7,10 +7,10 @@ import (
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// concurrentVerticalFlip applies the vertical flip filter to the entire image
+// VerticalFlip applies the vertical flip filter to the entire image
 // using multiple goroutines. The image is divided into vertical strips to
 // ensure the correct mirrored layout.
-func concurrentVerticalFlip(img *image.RGBA) {
+func VerticalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)

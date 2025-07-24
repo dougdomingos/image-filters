@@ -4,13 +4,14 @@
 // effectively mirroring the image along its vertical axis.
 package horizontal_flip
 
-import "dougdomingos.com/image-filters/filters/types"
+import (
+	"dougdomingos.com/image-filters/filters"
+)
 
 // HorizontalFlipPipeline defines the horizontal flip filter pipeline. As this
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
-var HorizontalFlipPipeline = types.FilterPipeline{
-	Preprocess:       nil,
-	SerialFilter:     serialHorizontalFlip,
-	ConcurrentFilter: concurrentHorizontalFlip,
+var HorizontalFlipPipeline = filters.FilterPipeline{
+	Preprocess: nil,
+	Filter:     HorizontalFlip,
 }

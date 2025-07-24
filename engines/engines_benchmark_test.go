@@ -33,7 +33,7 @@ func BenchmarkExecuteSerial(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engines.ApplyFilterPipeline(img, &pipeline, false)
+		engines.ApplyFilterPipeline(img, &pipeline)
 	}
 }
 
@@ -51,7 +51,7 @@ func BenchmarkExecuteConcurrent(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engines.ApplyFilterPipeline(img, &pipeline, true)
+		engines.ApplyFilterPipeline(img, &pipeline)
 	}
 }
 

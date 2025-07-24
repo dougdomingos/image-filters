@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 
-	"dougdomingos.com/image-filters/filters/types"
+	"dougdomingos.com/image-filters/filters"
 )
 
 // ProcessorRequestDTO represents the expected parameters for a parsed
@@ -26,11 +26,7 @@ type ProcessorRequestDTO struct {
 
 	// Pipeline is the requested filter pipeline that matches the "filter"
 	// parameter from the request.
-	Pipeline types.FilterPipeline
-
-	// IsConcurrent signals the engine to use the thread-safe pipeline
-	// implementation.
-	IsConcurrent bool
+	Pipeline filters.FilterPipeline
 }
 
 // ProcessorResponseDTO represents the JSON for processor HTTP responses.

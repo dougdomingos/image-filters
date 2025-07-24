@@ -7,10 +7,10 @@ import (
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// concurrentHorizontalFlip applies the horizontal flip filter to the entire
+// HorizontalFlip applies the horizontal flip filter to the entire
 // image using multiple goroutines. The image is divided into horizontal strips
 // to ensure the correct mirrored layout.
-func concurrentHorizontalFlip(img *image.RGBA) {
+func HorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)

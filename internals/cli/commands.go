@@ -28,7 +28,7 @@ func ListAvaliablePipelines() {
 // ApplyPipelineToImage loads an image from disk, applies the selected filter
 // pipeline to it and store the result image into the specified output
 // directory. It also allows the selection of the execution mode.
-func ApplyPipelineToImage(imgPath, outputDir, pipelineID string, isConcurrent bool) {
+func ApplyPipelineToImage(imgPath, outputDir, pipelineID string) {
 	imageRGBA, format, err := utils.LoadImage(imgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
@@ -44,10 +44,7 @@ func ApplyPipelineToImage(imgPath, outputDir, pipelineID string, isConcurrent bo
 		terminateWithError(err, FilterNotFoundError)
 	}
 
-	err = engines.ApplyFilterPipeline(imageRGBA, &pipeline, isConcurrent)
-	if err != nil {
-		terminateWithError(err, FilterNotImplementedError)
-	}
+	engines.ApplyFilterPipeline(imageRGBA, &pipeline)
 
 	outputFile := utils.GetProcessedImageFilename(imgPath, pipelineID)
 	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, outputFile)

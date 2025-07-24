@@ -4,10 +4,10 @@
 // effectively mirroring the image along its horizontal axis.
 package vertical_flip
 
-import "dougdomingos.com/image-filters/filters/types"
+import "dougdomingos.com/image-filters/filters"
 
-var VerticalFlipPipeline = types.FilterPipeline{
-	Preprocess:       nil,
-	SerialFilter:     serialVerticalFlip,
-	ConcurrentFilter: concurrentVerticalFlip,
+
+var VerticalFlipPipeline = filters.FilterPipeline{
+	Preprocess: nil,
+	Filter:     VerticalFlip,
 }

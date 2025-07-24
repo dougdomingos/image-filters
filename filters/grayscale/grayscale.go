@@ -7,9 +7,9 @@ import (
 	"dougdomingos.com/image-filters/filters/imgutil"
 )
 
-// concurrentGrayscale applies the grayscale filter to the entire image using
+// Grayscale applies the grayscale filter to the entire image using
 // multiple goroutines to process different partitions concurrently.
-func concurrentGrayscale(img *image.RGBA) {
+func Grayscale(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)

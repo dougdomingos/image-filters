@@ -18,14 +18,9 @@ const (
 	// filter specified by the user.
 	FilterNotFoundError = 4
 
-	// FilterNotImplementedError declares the exit code for selecting a filter
-	// pipeline that does not provide an implementation for either serial or
-	// concurrent execution modes.
-	FilterNotImplementedError = 5
-
 	// OutputDirError declares the exit code for failures when checking the
 	// existence of the specified output directory or creating it if needed.
-	OutputDirError = 6
+	OutputDirError = 5
 )
 
 // terminateWithError prints the error and exits the program with the given code.

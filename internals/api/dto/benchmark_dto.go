@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"dougdomingos.com/image-filters/filters/types"
+	"dougdomingos.com/image-filters/filters"
 )
 
 // BenchmarkRequestDTO represents the expected parameters for a parsed
@@ -13,7 +13,7 @@ type BenchmarkRequestDTO struct {
 
 	// FilterPipeline is the requested filter pipeline that matches the
 	// "filter" parameter from the request.
-	FilterPipeline types.FilterPipeline
+	FilterPipeline filters.FilterPipeline
 
 	// TestImageSize is the requested dimensions for the dummy image to be used
 	// on the benchmark tests.

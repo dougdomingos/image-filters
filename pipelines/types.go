@@ -3,7 +3,7 @@ package pipelines
 import (
 	"fmt"
 
-	"dougdomingos.com/image-filters/filters/types"
+	"dougdomingos.com/image-filters/filters"
 )
 
 // ProcessorNode represents a single filter pipeline in a processor queue. It
@@ -12,7 +12,7 @@ import (
 type ProcessNode struct {
 
 	// Pipeline holds the filter pipeline to be applied to the image.
-	Pipeline *types.FilterPipeline
+	Pipeline *filters.FilterPipeline
 
 	// Next points to the next pipeline in the queue, or nil if there isn't
 	// one.

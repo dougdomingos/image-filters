@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ func buildRouter() *http.ServeMux {
 
 	mux.HandleFunc("/process", services.ProcessorHandler)
 	mux.HandleFunc("/bench", services.BenchmarkHandler)
+	mux.HandleFunc("/images/", createFileHandler(os.Getenv("API_OUTPUT_DIR"), "/images/"))
 
 	return mux
 }
@@ -45,4 +47,12 @@ func withRequestLogger(next http.Handler) http.Handler {
 		log.Printf("[%s] Request to %s%s", timestamp, route, paramStr)
 		next.ServeHTTP(w, r)
 	})
+}
+
+func createFileHandler(outputDir string, prefix string) http.HandlerFunc {
+	fs := http.FileServer(http.Dir(outputDir))
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix(prefix, fs).ServeHTTP(w, r)
+	}
 }

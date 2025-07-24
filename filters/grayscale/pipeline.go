@@ -6,11 +6,13 @@
 // The alpha channel is left unmodified.
 package grayscale
 
-import "dougdomingos.com/image-filters/filters/types"
+import (
+	"dougdomingos.com/image-filters/filters"
+)
 
 // GrayscalePipeline defines the grayscale filter pipeline. Grayscale does not
 // require any preprocessing pipeline, and so, no preprocess step is declared.
-var GrayscalePipeline = types.FilterPipeline{
+var GrayscalePipeline = filters.FilterPipeline{
 	Preprocess: nil,
 	Filter:     Grayscale,
 }

@@ -10,14 +10,14 @@
 package binarization
 
 import (
+	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/filters/grayscale"
-	"dougdomingos.com/image-filters/filters/types"
 )
 
 // BinarizationPipeline defines the binarization filter pipeline. Since
 // binarization works best on grayscaled image, it uses the GrayscalePipeline
 // as a preprocessing step.
-var BinarizationPipeline = types.FilterPipeline{
+var BinarizationPipeline = filters.FilterPipeline{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Binarization,
 }

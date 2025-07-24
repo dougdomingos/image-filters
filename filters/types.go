@@ -1,6 +1,6 @@
 // Package filters provides a set of image filters implemented using
 // pixel-based manipulation techniques.
-package types
+package filters
 
 import "image"
 

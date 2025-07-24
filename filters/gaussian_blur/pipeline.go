@@ -7,12 +7,12 @@
 // (represented by sigma, or "σ").
 package gaussian_blur
 
-import "dougdomingos.com/image-filters/filters/types"
+import "dougdomingos.com/image-filters/filters"
 
 // GaussianBlurPipeline defines the Gaussian blur filter pipeline. As this
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
-var GaussianBlurPipeline = types.FilterPipeline{
+var GaussianBlurPipeline = filters.FilterPipeline{
 	Preprocess: nil,
 	Filter:     GaussianBlur,
 }

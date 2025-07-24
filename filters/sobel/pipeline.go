@@ -8,14 +8,14 @@
 package sobel
 
 import (
+	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/filters/grayscale"
-	"dougdomingos.com/image-filters/filters/types"
 )
 
 // SobelPipeline defines the sobel filter pipeline. As Sobel's Operator does
 // not require any preprocessing to detect edges within a image, no
 // preprocessing step is declared.
-var SobelPipeline = types.FilterPipeline{
+var SobelPipeline = filters.FilterPipeline{
 	Preprocess: nil,
 	Filter:     Sobel,
 }
@@ -26,7 +26,7 @@ var SobelPipeline = types.FilterPipeline{
 // channel, but not the other). As such, its results can be improved by using
 // grayscaled images, which would only account variations on brightness and
 // intensity.
-var SobelGrayscaledPipeline = types.FilterPipeline{
+var SobelGrayscaledPipeline = filters.FilterPipeline{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Sobel,
 }

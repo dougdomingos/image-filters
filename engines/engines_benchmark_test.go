@@ -3,6 +3,7 @@ package engines_test
 import (
 	"flag"
 	"image"
+	"os"
 	"testing"
 
 	"dougdomingos.com/image-filters/engines"
@@ -24,6 +25,7 @@ var (
 // It retrieves the specified filter pipeline, prepares a dummy image, and runs
 // the serial execution multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteSerial(b *testing.B) {
+	os.Setenv("MAX_WORKERS_PER_REQUEST", "1")
 	img := generateDummyImage(*imageSize)
 	pipeline, err := pipelines.GetFilterPipeline(*filterName)
 	if err != nil {
@@ -42,6 +44,7 @@ func BenchmarkExecuteSerial(b *testing.B) {
 // filter pipeline, prepares a dummy image, and runs the concurrent execution
 // multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteConcurrent(b *testing.B) {
+	os.Unsetenv("MAX_WORKERS_PER_REQUEST")
 	img := generateDummyImage(*imageSize)
 	pipeline, err := pipelines.GetFilterPipeline(*filterName)
 	if err != nil {

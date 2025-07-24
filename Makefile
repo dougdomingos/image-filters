@@ -6,13 +6,11 @@ CLI_PATH = ./cmd/cli
 API_PATH = ./cmd/api
 
 # Parameters
-CONCURRENT ?=
-CONCURRENT_FLAG := $(if $(CONCURRENT), --concurrent)
 OUT_DIR = ./output
 IMG_SIZE = 5000
 
-run-cli:   ## Run the CLI with args (e.g. make run IMG=img.jpg FILTER=grayscale MODE=serial)
-	go run $(CLI_PATH) -img $(IMG) -outDir $(OUT_DIR) -filter $(FILTER) $(CONCURRENT_FLAG)
+run-cli:   ## Run the CLI with args (e.g. make run IMG=img.jpg FILTER=grayscale)
+	go run $(CLI_PATH) -img $(IMG) -outDir $(OUT_DIR) -filter $(FILTER)
 
 run-api:   ## Start the REST API server
 	go run $(API_PATH)

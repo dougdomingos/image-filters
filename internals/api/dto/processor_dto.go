@@ -27,10 +27,6 @@ type ProcessorRequestDTO struct {
 	// Pipeline is the requested filter pipeline that matches the "filter"
 	// parameter from the request.
 	Pipeline types.FilterPipeline
-
-	// IsConcurrent signals the engine to use the thread-safe pipeline
-	// implementation.
-	IsConcurrent bool
 }
 
 // ProcessorResponseDTO represents the JSON for processor HTTP responses.

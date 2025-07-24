@@ -23,7 +23,7 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	engines.ApplyFilterPipeline(rgbaImage, &requestData.Pipeline, requestData.IsConcurrent)
+	engines.ApplyFilterPipeline(rgbaImage, &requestData.Pipeline)
 
 	outputDir := os.Getenv("API_OUTPUT_DIR")
 	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, requestData.FilterName)
@@ -75,17 +75,11 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Image format is not supported"
 	}
 
-	isConcurrent := false
-	if c := r.URL.Query().Get("concurrent"); c == "true" {
-		isConcurrent = true
-	}
-
 	return &dto.ProcessorRequestDTO{
 		Img:          img,
 		ImgFormat:    format,
 		ImgFilename:  header.Filename,
 		FilterName:   filterName,
 		Pipeline:     filter,
-		IsConcurrent: isConcurrent,
 	}, http.StatusOK, ""
 }

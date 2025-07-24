@@ -23,8 +23,8 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dummyImg := image.NewRGBA(image.Rect(0, 0, requestData.TestImageSize, requestData.TestImageSize))
-	serialRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg, false)
-	concurrentRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg, true)
+	serialRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg)
+	concurrentRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg)
 
 	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
 
@@ -67,9 +67,9 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 // benchmarkPipeline applies a filter pipeline to an image and returns the
 // processing duration in milliseconds. The caller may specify if the pipeline
 // should run concurrently or not.
-func benchmarkPipeline(pipeline types.FilterPipeline, img image.RGBA, concurrentMode bool) int64 {
+func benchmarkPipeline(pipeline types.FilterPipeline, img image.RGBA) int64 {
 	start := time.Now()
-	engines.ApplyFilterPipeline(&img, &pipeline, concurrentMode)
+	engines.ApplyFilterPipeline(&img, &pipeline)
 	duration := time.Since(start)
 
 	return duration.Milliseconds()

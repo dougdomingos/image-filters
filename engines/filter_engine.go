@@ -6,14 +6,12 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
-// ApplyFilterPipeline handles the execution of a filter pipeline, applying
-// preprocessing steps recursively (if needed) and selecting the filter
-// implementation to be executed.
-func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConcurrent bool) error {
+// ApplyFilterPipeline handles the execution of a filter pipeline, applying the
+// preprocess filter (if present) and then the core filter implementation.
+func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline)  {
 	if pipeline.Preprocess != nil {
 		pipeline.Preprocess(img)
 	}
 
 	pipeline.Filter(img)
-	return nil
 }

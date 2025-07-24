@@ -4,6 +4,9 @@ import (
 	"image"
 	"math"
 	"runtime"
+	"strconv"
+
+	"dougdomingos.com/image-filters/internals/utils"
 )
 
 // GetVerticalPartitions splits an image's bounds into an arbitrary number of
@@ -38,14 +41,21 @@ func GetHorizontalPartitions(bounds image.Rectangle, segments int) []image.Recta
 	return partitions
 }
 
-// GetNumberOfWorkers calculates the optimal number of workers based on the
-// number of logical CPUs available and the size of the task (given by the
-// bounds). The function considers both the number of available CPUs and the
-// width of each worker's segment. It also ensures that, if the width of the
-// segments is less than zero, the returned value would be 1.
+// GetNumberOfWorkers calculates the optimal number of worker goroutines based
+// on an arbitrary upper bound (either specified through an environment
+// variable or the number of logical CPUs in the system) and the size of the
+// image to be processed. It also ensures that, if the average width of the
+// segments is less than one, at least one worker should spawn.
 func GetNumberOfWorkers(bounds image.Rectangle) int {
-	numLogicCPUs := runtime.NumCPU()
-	segmentWidthPerLogicCPU := bounds.Max.X / numLogicCPUs
+	maxWorkers := runtime.NumCPU()
 
-	return max(min(numLogicCPUs, segmentWidthPerLogicCPU), 1)
+	envVar, err := utils.GetEnvVar("MAX_WORKERS_PER_REQUEST")
+	if err == nil && envVar != "" {
+		if envWorkersVal, err := strconv.Atoi(envVar); err == nil {
+			maxWorkers = envWorkersVal
+		}
+	}
+
+	segmentWidthPerWorker := bounds.Max.X / maxWorkers
+	return max(min(maxWorkers, segmentWidthPerWorker), 1)
 }

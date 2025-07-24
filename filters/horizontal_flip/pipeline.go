@@ -10,7 +10,6 @@ import "dougdomingos.com/image-filters/filters/types"
 // filter does not require any preprocessing pipeline, the preprocess step is
 // not declared.
 var HorizontalFlipPipeline = types.FilterPipeline{
-	Preprocess:       nil,
-	SerialFilter:     serialHorizontalFlip,
-	ConcurrentFilter: concurrentHorizontalFlip,
+	Preprocess:   nil,
+	Filter:       concurrentHorizontalFlip,
 }

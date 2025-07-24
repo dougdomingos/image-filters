@@ -11,7 +11,6 @@ import "dougdomingos.com/image-filters/filters/types"
 // GrayscalePipeline defines the grayscale filter pipeline. Grayscale does not
 // require any preprocessing pipeline, and so, no preprocess step is declared.
 var GrayscalePipeline = types.FilterPipeline{
-	Preprocess:       nil,
-	SerialFilter:     serialGrayscale,
-	ConcurrentFilter: concurrentGrayscale,
+	Preprocess:   nil,
+	Filter:       concurrentGrayscale,
 }

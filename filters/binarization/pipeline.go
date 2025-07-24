@@ -18,7 +18,6 @@ import (
 // binarization works best on grayscaled image, it uses the GrayscalePipeline
 // as a preprocessing step.
 var BinarizationPipeline = types.FilterPipeline{
-	Preprocess:       &grayscale.GrayscalePipeline,
-	SerialFilter:     serialBinarization,
-	ConcurrentFilter: concurrentBinarization,
+	Preprocess:   &grayscale.GrayscalePipeline,
+	Filter:       concurrentBinarization,
 }

@@ -1,7 +1,6 @@
 package engines
 
 import (
-	"fmt"
 	"image"
 
 	"dougdomingos.com/image-filters/filters/types"
@@ -17,20 +16,15 @@ func ApplyFilterPipeline(img *image.RGBA, pipeline *types.FilterPipeline, isConc
 		ApplyFilterPipeline(img, preprocess, isConcurrent)
 	}
 
-	filter := getFilterFromPipeline(pipeline, isConcurrent)
-	if filter == nil {
-		return fmt.Errorf("[ERROR] selected pipeline has no implementation for current execution mode")
-	}
-
-	filter(img)
+	pipeline.Filter(img)
 	return nil
 }
 
 // getFilterFromPipeline returns the filter function that corresponds to the
 // selected execution mode (either serial or concurrent).
-func getFilterFromPipeline(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
-	if isConcurrent {
-		return pipeline.ConcurrentFilter
-	}
-	return pipeline.SerialFilter
-}
+// func getFilterFromPipeline(pipeline *types.FilterPipeline, isConcurrent bool) types.Filter {
+// 	if isConcurrent {
+// 		return pipeline.Filter
+// 	}
+// 	return pipeline.SerialFilter
+// }

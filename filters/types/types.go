@@ -22,12 +22,8 @@ type FilterPipeline struct {
 	// performed.
 	Preprocess *FilterPipeline
 
-	// SerialFilter is the main implementation of the filter algorithm,
-	// that process the entire image in a single pass.
-	SerialFilter Filter
-
-	// ConcurrentFilter is a variation of the main filter that supports parallel
-	// processing. It splits the image into different partitions and processes
-	// them independently.
-	ConcurrentFilter Filter
+	// Filter is a thread-safe implementation of the filter algorithm. It
+	// splits the image into different partitions and processes them
+	// independently.
+	Filter Filter
 }

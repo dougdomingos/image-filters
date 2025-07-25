@@ -15,13 +15,13 @@ import (
 // AvailableFilters maps a string identifier to its corresponding filter
 // pipeline.
 var AvaliableFilters = map[string]filters.Action{
-	"binarization":     binarization.BinarizationPipeline,
-	"grayscale":        grayscale.GrayscalePipeline,
-	"horizontal-flip":  horizontal_flip.HorizontalFlipPipeline,
-	"sobel":            sobel.SobelPipeline,
-	"sobel-grayscaled": sobel.SobelGrayscaledPipeline,
-	"vertical-flip":    vertical_flip.VerticalFlipPipeline,
-	"gaussian-blur":    gaussian_blur.GaussianBlurPipeline,
+	"binarization":     binarization.BinarizationAction,
+	"grayscale":        grayscale.GrayscaleAction,
+	"horizontal-flip":  horizontal_flip.HorizontalFlipAction,
+	"sobel":            sobel.SobelAction,
+	"sobel-grayscaled": sobel.SobelGrayscaledAction,
+	"vertical-flip":    vertical_flip.VerticalFlipAction,
+	"gaussian-blur":    gaussian_blur.GaussianBlurAction,
 	// add more filters here...
 }
 

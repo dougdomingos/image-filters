@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"dougdomingos.com/image-filters/engines"
 	"dougdomingos.com/image-filters/internals/utils"
@@ -25,10 +26,7 @@ func ListAvaliablePipelines() {
 	}
 }
 
-// ApplyPipelineToImage loads an image from disk, applies the selected filter
-// pipeline to it and store the result image into the specified output
-// directory. It also allows the selection of the execution mode.
-func ApplyPipelineToImage(imgPath, outputDir, pipelineID string) {
+func ApplyRecipeToImage(imgPath, outputDir string, filters []string) {
 	imageRGBA, format, err := utils.LoadImage(imgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
@@ -39,14 +37,14 @@ func ApplyPipelineToImage(imgPath, outputDir, pipelineID string) {
 		terminateWithError(err, OutputDirError)
 	}
 
-	pipeline, err := pipelines.GetFilterPipeline(pipelineID)
+	recipe, err := pipelines.BuildRecipe(filters)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}
 
-	engines.ApplyFilterPipeline(imageRGBA, &pipeline)
+	engines.ProcessRecipe(imageRGBA, &recipe)
 
-	outputFile := utils.GetProcessedImageFilename(imgPath, pipelineID)
+	outputFile := utils.GetProcessedImageFilename(imgPath, time.Now().String())
 	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, outputFile)
 	if err != nil {
 		terminateWithError(err, ImageSavingError)

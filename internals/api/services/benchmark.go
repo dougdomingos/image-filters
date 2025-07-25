@@ -6,10 +6,10 @@ import (
 	"image"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"dougdomingos.com/image-filters/engines"
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/internals/api/dto"
 	"dougdomingos.com/image-filters/pipelines"
 )
@@ -23,8 +23,8 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dummyImg := image.NewRGBA(image.Rect(0, 0, requestData.TestImageSize, requestData.TestImageSize))
-	serialRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg)
-	concurrentRuntime := benchmarkPipeline(requestData.FilterPipeline, *dummyImg)
+	serialRuntime := benchmarkPipeline(requestData.Recipe, *dummyImg)
+	concurrentRuntime := benchmarkPipeline(requestData.Recipe, *dummyImg)
 
 	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
 
@@ -39,9 +39,9 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 // intended for the benchmark service. It ensures the presence of required
 // fields, and converts values as required.
 func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, string) {
-	filterName := r.URL.Query().Get("filter")
-	if filterName == "" {
-		return nil, http.StatusBadRequest, "Parameter \"filter\" is required"
+	filters := r.URL.Query().Get("filters")
+	if filters == "" {
+		return nil, http.StatusBadRequest, "Parameter \"filters\" is required"
 	}
 
 	sampleSize := r.URL.Query().Get("sample-size")
@@ -53,23 +53,20 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"sample-size\" must be numeric"
 	}
 
-	pipeline, err := pipelines.GetFilterPipeline(filterName)
+	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
 	if err != nil {
-		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filterName)
+		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filters)
 	}
 
 	return &dto.BenchmarkRequestDTO{
-		FilterPipeline: pipeline,
-		TestImageSize:  castedSampleSize,
+		Recipe:        recipe,
+		TestImageSize: castedSampleSize,
 	}, http.StatusOK, ""
 }
 
-// benchmarkPipeline applies a filter pipeline to an image and returns the
-// processing duration in milliseconds. The caller may specify if the pipeline
-// should run concurrently or not.
-func benchmarkPipeline(pipeline filters.Action, img image.RGBA) int64 {
+func benchmarkPipeline(recipe pipelines.Recipe, img image.RGBA) int64 {
 	start := time.Now()
-	engines.ApplyFilterPipeline(&img, &pipeline)
+	engines.ProcessRecipe(&img, &recipe)
 	duration := time.Since(start)
 
 	return duration.Milliseconds()

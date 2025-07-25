@@ -6,6 +6,8 @@ import (
 	"image"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"dougdomingos.com/image-filters/engines"
 	"dougdomingos.com/image-filters/internals/api/dto"
@@ -23,10 +25,10 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	engines.ApplyFilterPipeline(rgbaImage, &requestData.Pipeline)
+	engines.ProcessRecipe(rgbaImage, &requestData.Recipe)
 
 	outputDir := os.Getenv("API_OUTPUT_DIR")
-	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, requestData.FilterName)
+	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, time.Now().Format("20060102_150405"))
 	_, err := utils.SaveImage(rgbaImage, requestData.ImgFormat, outputDir, outputFilename)
 	if err != nil {
 		http.Error(w, "Unable to store image on disk", http.StatusInsufficientStorage)
@@ -53,19 +55,19 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		}
 		return nil, http.StatusBadRequest, "Malformed multipart/form-data request"
 	}
-
+	
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		return nil, http.StatusBadRequest, "No image provided"
 	}
 	defer file.Close()
 
-	filterName := r.URL.Query().Get("filter")
-	if filterName == "" {
-		return nil, http.StatusBadRequest, "Parameter \"filter\" is required"
+	filters := r.URL.Query().Get("filters")
+	if filters == "" {
+		return nil, http.StatusBadRequest, "Parameter \"filters\" is required"
 	}
 
-	filter, err := pipelines.GetFilterPipeline(filterName)
+	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}
@@ -76,10 +78,9 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 	}
 
 	return &dto.ProcessorRequestDTO{
-		Img:          img,
-		ImgFormat:    format,
-		ImgFilename:  header.Filename,
-		FilterName:   filterName,
-		Pipeline:     filter,
+		Img:         img,
+		ImgFormat:   format,
+		ImgFilename: header.Filename,
+		Recipe:      recipe,
 	}, http.StatusOK, ""
 }

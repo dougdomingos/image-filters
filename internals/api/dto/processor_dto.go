@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 
-	"dougdomingos.com/image-filters/filters"
+	"dougdomingos.com/image-filters/pipelines"
 )
 
 // ProcessorRequestDTO represents the expected parameters for a parsed
@@ -20,13 +20,7 @@ type ProcessorRequestDTO struct {
 	// ImgFilename is the name of the image file sent through the request.
 	ImgFilename string
 
-	// FilterName is the ID of the requested filter pipeline, used to
-	// identify the filter that was applied to a image persisted on disk.
-	FilterName string
-
-	// Pipeline is the requested filter pipeline that matches the "filter"
-	// parameter from the request.
-	Pipeline filters.Action
+	Recipe pipelines.Recipe
 }
 
 // ProcessorResponseDTO represents the JSON for processor HTTP responses.

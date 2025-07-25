@@ -4,6 +4,7 @@ import (
 	"flag"
 	"image"
 	"os"
+	"strings"
 	"testing"
 
 	"dougdomingos.com/image-filters/engines"
@@ -12,7 +13,7 @@ import (
 
 var (
 	// filterName specifies the name of the filter to use during benchmarking.
-	filterName = flag.String("filter", "", "Name of the filter to use in benchmarks")
+	filterName = flag.String("filters", "", "Name of the filter to use in benchmarks")
 
 	// imageSize defines the width and height (in pixels) of the square dummy
 	// image used for benchmarking.
@@ -26,16 +27,16 @@ var (
 // the serial execution multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteSerial(b *testing.B) {
 	os.Setenv("MAX_WORKERS_PER_REQUEST", "1")
-	img := generateDummyImage(*imageSize)
-	pipeline, err := pipelines.GetFilterPipeline(*filterName)
+	recipe, err := pipelines.BuildRecipe(strings.Split(*filterName, ","))
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
-
+	
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engines.ApplyFilterPipeline(img, &pipeline)
+		img := generateDummyImage(*imageSize)
+		engines.ProcessRecipe(img, &recipe)
 	}
 }
 
@@ -45,16 +46,16 @@ func BenchmarkExecuteSerial(b *testing.B) {
 // multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteConcurrent(b *testing.B) {
 	os.Unsetenv("MAX_WORKERS_PER_REQUEST")
-	img := generateDummyImage(*imageSize)
-	pipeline, err := pipelines.GetFilterPipeline(*filterName)
+	recipe, err := pipelines.BuildRecipe(strings.Split(*filterName, ","))
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
-
+	
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		engines.ApplyFilterPipeline(img, &pipeline)
+		img := generateDummyImage(*imageSize)
+		engines.ProcessRecipe(img, &recipe)
 	}
 }
 

@@ -10,7 +10,7 @@ OUT_DIR = ./output
 IMG_SIZE = 5000
 
 run-cli:   ## Run the CLI with args (e.g. make run IMG=img.jpg FILTER=grayscale)
-	go run $(CLI_PATH) -img $(IMG) -outDir $(OUT_DIR) -filter $(FILTER)
+	go run $(CLI_PATH) -img $(IMG) -outDir $(OUT_DIR) -filters $(FILTERS)
 
 run-api:   ## Start the REST API server
 	go run $(API_PATH)
@@ -19,7 +19,7 @@ list:      ## List the avaliable filter pipelines
 	go run $(CLI_PATH) --list
 
 bench:     ## Run a benchmark of a specific filter in both serial and concurrent modes
-	go test -bench=. -run=^$$ -benchmem ./engines -args -filter $(FILTER) -imageSize $(IMG_SIZE)
+	go test -bench=. -run=^$$ -benchmem ./engines -args -filters $(FILTERS) -imageSize $(IMG_SIZE)
 
 build-cli: ## Build the CLI binary. The binary will be named "image-filters-cli"
 	mkdir -p $(DIST_DIR)

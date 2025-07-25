@@ -1,6 +1,8 @@
 package main
 
-import "dougdomingos.com/image-filters/internals/cli"
+import (
+	"dougdomingos.com/image-filters/internals/cli"
+)
 
 func main() {
 	flags := cli.ParseInputFlags()
@@ -8,6 +10,6 @@ func main() {
 	if flags.ListPipelines {
 		cli.ListAvaliablePipelines()
 	} else {
-		cli.ApplyPipelineToImage(flags.ImgPath, flags.OutputDir, flags.FilterName)
+		cli.ApplyRecipeToImage(flags.ImgPath, flags.OutputDir, flags.Filters)
 	}
 }

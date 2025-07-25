@@ -10,9 +10,7 @@ import (
 	"dougdomingos.com/image-filters/filters"
 )
 
-// GrayscalePipeline defines the grayscale filter pipeline. Grayscale does not
-// require any preprocessing pipeline, and so, no preprocess step is declared.
-var GrayscalePipeline = filters.Action{
+var GrayscaleAction = filters.Action{
 	Preprocess: nil,
 	Filter:     Grayscale,
 }

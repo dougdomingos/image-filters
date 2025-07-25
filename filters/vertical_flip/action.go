@@ -6,7 +6,7 @@ package vertical_flip
 
 import "dougdomingos.com/image-filters/filters"
 
-var VerticalFlipPipeline = filters.Action{
+var VerticalFlipAction = filters.Action{
 	Preprocess: nil,
 	Filter:     VerticalFlip,
 }

@@ -9,10 +9,7 @@ package gaussian_blur
 
 import "dougdomingos.com/image-filters/filters"
 
-// GaussianBlurPipeline defines the Gaussian blur filter pipeline. As this
-// filter does not require any preprocessing pipeline, the preprocess step is
-// not declared.
-var GaussianBlurPipeline = filters.Action{
+var GaussianBlurAction = filters.Action{
 	Preprocess: nil,
 	Filter:     GaussianBlur,
 }

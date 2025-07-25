@@ -14,10 +14,7 @@ import (
 	"dougdomingos.com/image-filters/filters/grayscale"
 )
 
-// BinarizationPipeline defines the binarization filter pipeline. Since
-// binarization works best on grayscaled image, it uses the GrayscalePipeline
-// as a preprocessing step.
-var BinarizationPipeline = filters.Action{
+var BinarizationAction = filters.Action{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Binarization,
 }

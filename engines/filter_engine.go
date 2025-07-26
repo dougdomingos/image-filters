@@ -7,13 +7,11 @@ import (
 )
 
 func ProcessRecipe(img *image.RGBA, recipe *pipelines.Recipe) {
-	currentStep := recipe.NextStep()
-	for currentStep != nil {
-		if currentStep.Action.Preprocess != nil {
-			currentStep.Action.Preprocess(img)
+	for step := recipe.Head; step != nil; step = recipe.NextStep() {
+		if step.Action.Preprocess != nil {
+			step.Action.Preprocess(img)
 		}
 
-		currentStep.Action.Filter(img)
-		currentStep = recipe.NextStep()
+		step.Action.Filter(img)
 	}
 }

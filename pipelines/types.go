@@ -12,16 +12,16 @@ type Step struct {
 }
 
 type Recipe struct {
-	head *Step
+	Head *Step
 }
 
-func (procQueue *Recipe) NextStep() *Step {
-	if procQueue.head == nil {
+func (recipe *Recipe) NextStep() *Step {
+	if recipe.Head == nil {
 		return nil
 	}
 
-	currentHead := procQueue.head
-	procQueue.head = procQueue.head.Next
+	currentHead := recipe.Head
+	recipe.Head = recipe.Head.Next
 	return currentHead
 }
 
@@ -45,5 +45,5 @@ func BuildRecipe(filterIDs []string) (Recipe, error) {
 		}
 	}
 
-	return Recipe{head: head}, nil
+	return Recipe{Head: head}, nil
 }

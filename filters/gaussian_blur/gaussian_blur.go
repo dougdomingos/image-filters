@@ -17,53 +17,47 @@ func GaussianBlur(img *image.RGBA) {
 		imageStrips                  = imgutil.GetVerticalPartitions(bounds, numWorkers)
 		sigma                        = computeKernelSigma(kernelSize)
 		gaussianKernel, kernelOffset = generateGaussianKernel(kernelSize, sigma)
+		paddedCopy                   = imgutil.CreatePaddedCopy(*img, kernelOffset)
 		mainWg                       sync.WaitGroup
-		copyWg                       sync.WaitGroup
 	)
 
 	mainWg.Add(numWorkers)
-	copyWg.Add(numWorkers)
 	for strip := range imageStrips {
-		go gaussianBlurWorker(img, imageStrips[strip], gaussianKernel, kernelOffset, &mainWg, &copyWg)
+		go gaussianBlurWorker(img, &paddedCopy, imageStrips[strip], gaussianKernel, kernelOffset, &mainWg)
 	}
 
 	mainWg.Wait()
 }
 
-// gaussianBlurWorker process a subregion of the image by creating a padded
-// copy of the subregion and using it to compute the weighted color values for
-// each pixel within the partition. It ensures that no worker goroutine edits
-// certain parts of the original image before the others have finished their
-// copy stage.
-func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]float64, kernelOffset int, mainWg, copyWg *sync.WaitGroup) {
+// gaussianBlurWorker process a subregion of the image by applying the gaussian
+// blur filter based on a global copy of the original image, computing the
+// weighted color values for each pixel within the partition.
+func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, kernel [][]float64, kernelOffset int, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
-	copyImg := func() image.RGBA {
-		defer copyWg.Done()
-		return imgutil.CopyPaddedImagePartition(img, bounds, kernelOffset)
-	}()
 
-	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+kernelOffset, copyImg.Rect.Max.X-kernelOffset
-	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+kernelOffset, copyImg.Rect.Max.Y-kernelOffset
+	originalBounds := img.Bounds()
+	paddedMinX := bounds.Min.X + kernelOffset
+	paddedMaxX := bounds.Max.X + kernelOffset
+	paddedMinY := bounds.Min.Y + kernelOffset
+	paddedMaxY := bounds.Max.Y + kernelOffset
 
 	for y := paddedMinY; y < paddedMaxY; y++ {
-		srcRowStart := (y - kernelOffset) * img.Stride
-		for x := paddedMinX; x < paddedMaxX; x++ {
-			if x == paddedMaxX-kernelOffset {
-				copyWg.Wait()
-			}
+		srcRow := (y - kernelOffset) * img.Stride
 
+		for x := paddedMinX; x < paddedMaxX; x++ {
 			var sumR, sumG, sumB, sumA, kernelWeightSum float64
+			srcCol := srcRow + (x-kernelOffset)*4
 
 			for ky := -kernelOffset; ky <= kernelOffset; ky++ {
 				for kx := -kernelOffset; kx <= kernelOffset; kx++ {
 					deltaX, deltaY := x+kx, y+ky
 
 					// disconsider padding pixels from blurring calculations
-					if !imgutil.IsPositionWithinOriginalImage(img, deltaX, deltaY, kernelOffset) {
+					if !imgutil.MapsToOriginalPixel(originalBounds, deltaX, deltaY, kernelOffset) {
 						continue
 					}
 
-					r, g, b, a := imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
+					r, g, b, a := imgutil.GetRGBA8(paddedCopy, deltaX, deltaY)
 					kernelWeight := kernel[ky+kernelOffset][kx+kernelOffset]
 
 					sumR += float64(r) * kernelWeight
@@ -83,8 +77,7 @@ func gaussianBlurWorker(img *image.RGBA, bounds image.Rectangle, kernel [][]floa
 			}
 
 			updatedColor := []uint8{clamp256(sumR), clamp256(sumG), clamp256(sumB), clamp256(sumA)}
-			copyOffset := srcRowStart + (x-kernelOffset)*4
-			copy(img.Pix[copyOffset:copyOffset+4], updatedColor)
+			copy(img.Pix[srcCol:srcCol+4], updatedColor)
 		}
 	}
 }

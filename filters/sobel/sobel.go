@@ -16,40 +16,34 @@ func Sobel(img *image.RGBA) {
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
 		imageStrips = imgutil.GetVerticalPartitions(bounds, numWorkers)
+		paddedCopy  = imgutil.CreatePaddedCopy(*img, copyPadding)
 		mainWg      sync.WaitGroup
-		copyWg      sync.WaitGroup
 	)
 
 	mainWg.Add(numWorkers)
-	copyWg.Add(numWorkers)
 	for strip := range imageStrips {
-		go sobelWorker(img, imageStrips[strip], &mainWg, &copyWg)
+		go sobelWorker(img, &paddedCopy, imageStrips[strip], &mainWg)
 	}
 
 	mainWg.Wait()
 }
 
 // sobelWorker processes a subregion of the image by applying the sobel filter
-// based on a global copy of the original image, which is used to compute the
-// gradients of each color channel.
-func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.WaitGroup) {
+// based on a global copy of the original image, computing the kernel values of
+// each color channel of each pixel in the subregion.
+func sobelWorker(srcImg, paddedCopy *image.RGBA, bounds image.Rectangle, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
-	copyImg := func() image.RGBA {
-		defer copyWg.Done()
-		return imgutil.CopyPaddedImagePartition(img, bounds, copyPadding)
-	}()
 
-	paddedMinX, paddedMaxX := copyImg.Rect.Min.X+copyPadding, copyImg.Rect.Max.X-copyPadding
-	paddedMinY, paddedMaxY := copyImg.Rect.Min.Y+copyPadding, copyImg.Rect.Max.Y-copyPadding
+	paddedMinX := bounds.Min.X + copyPadding
+	paddedMaxX := bounds.Max.X + copyPadding
+	paddedMinY := bounds.Min.Y + copyPadding
+	paddedMaxY := bounds.Max.Y + copyPadding
 
 	for y := paddedMinY; y < paddedMaxY; y++ {
-		srcRowStart := (y - copyPadding) * img.Stride
-		for x := paddedMinX; x < paddedMaxX; x++ {
-			if x == paddedMaxX-copyPadding {
-				copyWg.Wait()
-			}
+		srcRow := (y - copyPadding) * srcImg.Stride
 
-			offset := srcRowStart + (x-copyPadding)*4
+		for x := paddedMinX; x < paddedMaxX; x++ {
+			srcCol := srcRow + (x-copyPadding)*4
 
 			var r8, g8, b8, a8 uint8
 			var gxR, gxG, gxB, gyR, gyG, gyB int
@@ -59,7 +53,7 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.W
 					deltaX := x + kx
 					deltaY := y + ky
 
-					r8, g8, b8, a8 = imgutil.GetRGBA8(&copyImg, deltaX, deltaY)
+					r8, g8, b8, a8 = imgutil.GetRGBA8(paddedCopy, deltaX, deltaY)
 					r := int(r8)
 					g := int(g8)
 					b := int(b8)
@@ -81,7 +75,7 @@ func sobelWorker(img *image.RGBA, bounds image.Rectangle, mainWg, copyWg *sync.W
 			gradG := clampColorValue(math.Sqrt(float64(gxG*gxG + gyG*gyG)))
 			gradB := clampColorValue(math.Sqrt(float64(gxB*gxB + gyB*gyB)))
 
-			copy(img.Pix[offset:offset+4], []uint8{gradR, gradG, gradB, a8})
+			copy(srcImg.Pix[srcCol:srcCol+4], []uint8{gradR, gradG, gradB, a8})
 		}
 	}
 }

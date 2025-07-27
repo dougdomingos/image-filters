@@ -29,11 +29,9 @@ func GaussianBlur(img *image.RGBA) {
 	mainWg.Wait()
 }
 
-// gaussianBlurWorker process a subregion of the image by creating a padded
-// copy of the subregion and using it to compute the weighted color values for
-// each pixel within the partition. It ensures that no worker goroutine edits
-// certain parts of the original image before the others have finished their
-// copy stage.
+// gaussianBlurWorker process a subregion of the image by applying the gaussian
+// blur filter based on a global copy of the original image, computing the
+// weighted color values for each pixel within the partition.
 func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, kernel [][]float64, kernelOffset int, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
 

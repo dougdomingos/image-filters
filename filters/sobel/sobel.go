@@ -29,8 +29,8 @@ func Sobel(img *image.RGBA) {
 }
 
 // sobelWorker processes a subregion of the image by applying the sobel filter
-// based on a global copy of the original image, which is used to compute the
-// gradients of each color channel.
+// based on a global copy of the original image, computing the kernel values of
+// each color channel of each pixel in the subregion.
 func sobelWorker(srcImg, paddedCopy *image.RGBA, bounds image.Rectangle, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
 

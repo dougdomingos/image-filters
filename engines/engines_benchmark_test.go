@@ -18,6 +18,11 @@ var (
 	// imageSize defines the width and height (in pixels) of the square dummy
 	// image used for benchmarking.
 	imageSize = flag.Int("imageSize", 5000, "Width and height (in pixels) of the square dummy image used for benchmarking.")
+
+	// sinkPixel servers as a anchor value to ensure that the Go's compiler
+	// won't skip the filter's execution. It is used to store the first value
+	// in the image.Pix[] array.
+	sinkPixel uint8
 )
 
 // BenchmarkExecuteSerial measures the performance and memory allocations of
@@ -31,12 +36,13 @@ func BenchmarkExecuteSerial(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
-	
+
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		img := generateDummyImage(*imageSize)
 		engines.ProcessRecipe(img, &recipe)
+		sinkPixel = img.Pix[0]
 	}
 }
 
@@ -50,12 +56,13 @@ func BenchmarkExecuteConcurrent(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
-	
+
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		img := generateDummyImage(*imageSize)
 		engines.ProcessRecipe(img, &recipe)
+		sinkPixel = img.Pix[0]
 	}
 }
 

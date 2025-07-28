@@ -1,0 +1,83 @@
+package utils
+
+
+import (
+	"fmt"
+	"image"
+	"image/draw"
+	"image/jpeg"
+	"image/png"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+// LoadImage receives the path of an image file and returns it as an RGBA image,
+// along with its original format (e.g., "jpeg", "png").
+func LoadImage(filePath string) (*image.RGBA, string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, "", fmt.Errorf("[ERROR] Unable to load %s: %w", filePath, err)
+	}
+	defer file.Close()
+
+	img, format, err := image.Decode(file)
+	if err != nil {
+		return nil, "", fmt.Errorf("[ERROR] Unable to decode %s: %w", filePath, err)
+	}
+
+	bounds := img.Bounds()
+	rgba := image.NewRGBA(bounds)
+	draw.Draw(rgba, bounds, img, bounds.Min, draw.Src)
+
+	return rgba, format, nil
+}
+
+// SaveImage takes a RGBA image, its original encoding format and the path in
+// which it'll be stored and creates a new file containing the specified image
+// at that path.
+func SaveImage(img *image.RGBA, format string, outputDir string, outputFile string) (string, error) {
+	outputPath := filepath.Join(outputDir, outputFile)
+	file, err := os.Create(outputPath)
+	if err != nil {
+		return "", fmt.Errorf("[ERROR] Unable to create file \"%s\": %w", outputDir, err)
+	}
+	defer file.Close()
+
+	switch format {
+	case "jpeg":
+		err = jpeg.Encode(file, img, &jpeg.Options{Quality: 95})
+	case "png":
+		err = png.Encode(file, img)
+	default:
+		return "", fmt.Errorf("[ERROR] Unsupported image format")
+	}
+
+	return outputPath, err
+}
+
+// CreateOutputDir checks if a directory exists at the given path, and creates
+// it (with parents) if it doesn't.
+func CreateOutputDir(path string) error {
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("[ERROR]: Creating output directory failed! %s", err)
+	}
+
+	return err
+}
+
+// GetProcessedImageFilename takes the original image's path and the name of
+// the applied filter and returns the name of the output image file.
+// 
+// The output string is in the following format:
+// 
+// 	outputFile = [imgPathBase]-[filterName].[imgExtension]
+func GetProcessedImageFilename(imgFilepath, filterName string) string {
+	base := filepath.Base(imgFilepath)
+	ext := filepath.Ext(base)
+	name := strings.TrimSuffix(base, ext)
+	ext = strings.TrimPrefix(ext, ".")
+
+	return fmt.Sprintf("%s-%s.%s", name, filterName, ext)
+}

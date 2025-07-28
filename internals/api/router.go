@@ -49,6 +49,8 @@ func withRequestLogger(next http.Handler) http.Handler {
 	})
 }
 
+// createFileHandler creates a http.HandlerFunc specialized on serving requests
+// to images within the specified output directory.
 func createFileHandler(outputDir string, prefix string) http.HandlerFunc {
 	fs := http.FileServer(http.Dir(outputDir))
 

@@ -28,6 +28,9 @@ func StartHTTPServer() {
 	}
 }
 
+// getServerPort returns the port to which the HTTP server will listen for
+// requests. It reads the API_SERVER_PORT environment variable, and defaults to
+// 8080 if such variable is not declared or has an invalid value.
 func getServerPort() int {
 	serverPort, err := strconv.Atoi(os.Getenv("API_SERVER_PORT"))
 	if err != nil {

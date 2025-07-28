@@ -20,6 +20,7 @@ type ProcessorRequestDTO struct {
 	// ImgFilename is the name of the image file sent through the request.
 	ImgFilename string
 
+	// Recipe represents the list of filters to be applied to the image.
 	Recipe pipelines.Recipe
 }
 

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"fmt"
 	"image"
 	"net/http"
@@ -27,12 +26,7 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	concurrentRuntime := benchmarkPipeline(requestData.Recipe, *dummyImg)
 
 	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+	sendJSONResponse(w, response, statusCode)
 }
 
 // parseBenchmarkRequest extract and validates parameters from the HTTP request

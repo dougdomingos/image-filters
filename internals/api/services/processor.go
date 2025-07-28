@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"image"
 	"net/http"
@@ -35,12 +34,7 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := dto.BuildProcessorResponse(outputFilename)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+	sendJSONResponse(w, response, statusCode)
 }
 
 // parseProcessorRequest extracts and validates the required parameters from the

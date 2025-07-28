@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"os"
+	"strconv"
 
 	"dougdomingos.com/image-filters/internals/api"
 	"dougdomingos.com/image-filters/internals/utils"
@@ -20,5 +22,10 @@ func main() {
 		}
 	}
 
-	api.StartHTTPServer()
+	serverPort, err := strconv.Atoi(os.Getenv("API_SERVER_PORT"))
+	if err != nil {
+		serverPort = 8080
+	}
+
+	api.StartHTTPServer(serverPort)
 }

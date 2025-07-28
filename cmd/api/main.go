@@ -13,13 +13,9 @@ import (
 func main() {
 	godotenv.Load()
 
-	requiredEnvVars := []string{"API_OUTPUT_DIR", "MAX_REQUEST_SIZE"}
-	for _, key := range requiredEnvVars {
-		if x, err := utils.GetEnvVar(key); err != nil {
-			log.Fatalf("[ERROR] Missing required environment variable: %s\n", key)
-		} else {
-			log.Print(key, x)
-		}
+	requiredVars := []string{"API_OUTPUT_DIR", "MAX_REQUEST_SIZE"}
+	if err := utils.EnsureRequiredEnvVars(requiredVars); err != nil {
+		log.Fatal(err)
 	}
 
 	serverPort, err := strconv.Atoi(os.Getenv("API_SERVER_PORT"))

@@ -28,7 +28,7 @@ type ProcessorRequestDTO struct {
 type ProcessorResponseDTO struct {
 
 	// ProcessedImageURL is the remote path to access the processed image.
-	ProcessedImageURL string `json:"processedImageURL"`
+	ProcessedImageURL string `json:"processed_image_url"`
 }
 
 // BuildProcessorResponse constructs a ProcessorResponseDTO with the remote URL

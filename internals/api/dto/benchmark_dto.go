@@ -22,12 +22,12 @@ type BenchmarkRequestDTO struct {
 // BenchmarkResponseDTO represents the JSON for benchmark HTTP responses.
 type BenchmarkResponseDTO struct {
 
-	// TestImageSize is the inferred size (in megabytes), based on the
+	// ImageSizeInMB is the inferred size (in megabytes), based on the
 	// provided dimensions of the test image.
-	TestImageSize string `json:"testImageSize"`
+	ImageSizeInMB string `json:"image_size"`
 
 	// ExecTime is the measured execution time for the specified pipeline.
-	ExecTime int64 `json:"execTime"`
+	ExecTime int64 `json:"exec_time"`
 }
 
 // BuildBenchmarkResponse constructs a BenchmarkResponseDTO with image size
@@ -36,7 +36,7 @@ func BuildBenchmarkResponse(imgDimension int, execTime int64) BenchmarkResponseD
 	testImageSize := (math.Pow(float64(imgDimension), 2) * 4) / 1_000_000
 
 	return BenchmarkResponseDTO{
-		TestImageSize: fmt.Sprintf("%.2f MB", testImageSize),
+		ImageSizeInMB: fmt.Sprintf("%.4f MB", testImageSize),
 		ExecTime:      execTime,
 	}
 }

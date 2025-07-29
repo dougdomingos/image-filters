@@ -5,6 +5,7 @@ import (
 	"image"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -41,7 +42,7 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 // HTTP request intended for the processor service. It enforces constraints on
 // request size (max. 15 MB), required fields, and image format.
 func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, string) {
-	err := r.ParseMultipartForm(15 << 20)
+	err := r.ParseMultipartForm(getRequestMaxSize())
 	if err != nil {
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
@@ -77,4 +78,18 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		ImgFilename: header.Filename,
 		Recipe:      recipe,
 	}, http.StatusOK, ""
+}
+
+
+// getRequestMaxSize returns the maximum accepted size for processor requests
+// (in bytes). It reads the MAX_REQUEST_SIZE environment variable and defaults
+// to 10 MB if the variable has an invalid value.
+func getRequestMaxSize() int64 {
+	maxSizeInMB, err := strconv.Atoi(os.Getenv("MAX_REQUEST_SIZE"))
+	if err != nil {
+		maxSizeInMB = 10
+	}
+
+	maxSizeInBytes := maxSizeInMB << 20
+	return int64(maxSizeInBytes)
 }

@@ -25,7 +25,9 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	engines.ProcessPipeline(rgbaImage, &requestData.Recipe)
+	if err := engines.ProcessPipeline(rgbaImage, &requestData.Recipe); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	outputDir := os.Getenv("API_OUTPUT_DIR")
 	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, time.Now().Format("20060102_150405"))

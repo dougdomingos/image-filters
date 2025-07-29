@@ -38,12 +38,14 @@ func ApplyRecipeToImage(imgPath, outputDir string, filters []string) {
 		terminateWithError(err, OutputDirError)
 	}
 
-	recipe, err := pipelines.NewPipeline(filters)
+	pipeline, err := pipelines.NewPipeline(filters)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}
 
-	engines.ProcessPipeline(imageRGBA, &recipe)
+	if err := engines.ProcessPipeline(imageRGBA, &pipeline); err != nil {
+		terminateWithError(err, FilterNotFoundError)
+	}
 
 	outputFile := utils.GetProcessedImageFilename(imgPath, time.Now().String())
 	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, outputFile)

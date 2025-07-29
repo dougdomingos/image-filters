@@ -49,7 +49,7 @@ func GetNumberOfWorkers(bounds image.Rectangle) int {
 	maxWorkers := runtime.NumCPU()
 
 	envVar, isDeclared := os.LookupEnv("MAX_WORKERS_PER_REQUEST")
-	if !isDeclared && envVar != "" {
+	if isDeclared && envVar != "" {
 		if envWorkersVal, err := strconv.Atoi(envVar); err == nil {
 			maxWorkers = envWorkersVal
 		}

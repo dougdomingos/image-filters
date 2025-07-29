@@ -22,8 +22,8 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dummyImg := image.NewRGBA(image.Rect(0, 0, requestData.TestImageSize, requestData.TestImageSize))
-	serialRuntime := benchmarkRecipe(requestData.Recipe, *dummyImg)
-	concurrentRuntime := benchmarkRecipe(requestData.Recipe, *dummyImg)
+	serialRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
+	concurrentRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
 
 	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
 	sendJSONResponse(w, response, statusCode)
@@ -47,22 +47,22 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"sample-size\" must be numeric"
 	}
 
-	recipe, err := pipelines.NewPipeline(strings.Split(filters, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filters)
 	}
 
 	return &dto.BenchmarkRequestDTO{
-		Recipe:        recipe,
+		Pipeline:      pipeline,
 		TestImageSize: castedSampleSize,
 	}, http.StatusOK, ""
 }
 
-// benchmarkRecipe determines the total time spent on a recipe execution,
+// benchmarkPipeline determines the total time spent on a pipeline execution,
 // returning the result time in milliseconds.
-func benchmarkRecipe(recipe pipelines.Pipeline, img image.RGBA) int64 {
+func benchmarkPipeline(pipeline pipelines.Pipeline, img image.RGBA) int64 {
 	start := time.Now()
-	engines.ProcessPipeline(&img, &recipe)
+	engines.ProcessPipeline(&img, &pipeline)
 	duration := time.Since(start)
 
 	return duration.Milliseconds()

@@ -25,7 +25,7 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	if err := engines.ProcessPipeline(rgbaImage, &requestData.Recipe); err != nil {
+	if err := engines.ProcessPipeline(rgbaImage, &requestData.Pipeline); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -64,7 +64,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"filters\" is required"
 	}
 
-	recipe, err := pipelines.NewPipeline(strings.Split(filters, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}
@@ -78,7 +78,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		Img:         img,
 		ImgFormat:   format,
 		ImgFilename: header.Filename,
-		Recipe:      recipe,
+		Pipeline:    pipeline,
 	}, http.StatusOK, ""
 }
 

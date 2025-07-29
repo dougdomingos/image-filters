@@ -27,18 +27,20 @@ func ParseInputFlags() ParsedFlags {
 	return ParsedFlags{
 		ImgPath:       *imgPath,
 		OutputDir:     *outputDir,
-		Filters:       parseMultiValueFlag(filters),
+		Filters:       parseFilterIDList(filters),
 		ListPipelines: *listPipelines,
 	}
 }
 
-func parseMultiValueFlag(rawValue *string) []string {
-	if *rawValue == "" {
-		return nil
+// parseFilterIDList parses a comma-separated string of filter IDs and returns
+// them as a slice of strings. Leading and trailing whitespace around each ID
+// is trimmed. Returns an empty slice if the input is empty.
+func parseFilterIDList(filterList *string) []string {
+	if *filterList == "" {
+		return []string{}
 	}
 
-	// Split and clean the input
-	filters := strings.Split(*rawValue, ",")
+	filters := strings.Split(*filterList, ",")
 	for i := range filters {
 		filters[i] = strings.TrimSpace(filters[i])
 	}

@@ -6,22 +6,15 @@ import (
 	"os"
 )
 
-func GetEnvVar(key string) (string, error) {
-	value, isDeclared := os.LookupEnv(key)
-
-	if !isDeclared {
-		return "", fmt.Errorf("[ERROR] Required environment variable \"%s\" is not declared", key)
-	}
-
-	return value, nil
-}
-
+// EnsureRequiredEnvVars verifies if the variables specified through the
+// input slice are declared in the environment. If any variable is not
+// declared, returns an error indicating the missing variable.
 func EnsureRequiredEnvVars(keys []string) error {
 	for _, key := range keys {
-		if value, err := GetEnvVar(key); err != nil {
+		if value, isDeclared := os.LookupEnv(key); !isDeclared {
 			return fmt.Errorf("missing required environment variable: %s", key)
 		} else {
-			log.Printf("%s: %s", key, value)
+			log.Printf("[ENV] %s: %s", key, value)
 		}
 	}
 

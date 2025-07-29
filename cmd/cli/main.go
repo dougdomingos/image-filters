@@ -10,6 +10,6 @@ func main() {
 	if flags.ListPipelines {
 		cli.ListAvaliablePipelines()
 	} else {
-		cli.ApplyRecipeToImage(flags.ImgPath, flags.OutputDir, flags.Filters)
+		cli.ApplyPipelineToImage(flags.ImgPath, flags.OutputDir, flags.Filters)
 	}
 }

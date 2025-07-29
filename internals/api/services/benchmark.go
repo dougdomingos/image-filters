@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"fmt"
 	"image"
 	"net/http"
@@ -23,16 +22,11 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dummyImg := image.NewRGBA(image.Rect(0, 0, requestData.TestImageSize, requestData.TestImageSize))
-	serialRuntime := benchmarkPipeline(requestData.Recipe, *dummyImg)
-	concurrentRuntime := benchmarkPipeline(requestData.Recipe, *dummyImg)
+	serialRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
+	concurrentRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
 
 	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+	sendJSONResponse(w, response, statusCode)
 }
 
 // parseBenchmarkRequest extract and validates parameters from the HTTP request
@@ -53,20 +47,22 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"sample-size\" must be numeric"
 	}
 
-	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filters)
 	}
 
 	return &dto.BenchmarkRequestDTO{
-		Recipe:        recipe,
+		Pipeline:      pipeline,
 		TestImageSize: castedSampleSize,
 	}, http.StatusOK, ""
 }
 
-func benchmarkPipeline(recipe pipelines.Recipe, img image.RGBA) int64 {
+// benchmarkPipeline determines the total time spent on a pipeline execution,
+// returning the result time in milliseconds.
+func benchmarkPipeline(pipeline pipelines.Pipeline, img image.RGBA) int64 {
 	start := time.Now()
-	engines.ProcessRecipe(&img, &recipe)
+	engines.ProcessPipeline(&img, &pipeline)
 	duration := time.Since(start)
 
 	return duration.Milliseconds()

@@ -6,11 +6,6 @@
 // The alpha channel is left unmodified.
 package grayscale
 
-import (
-	"dougdomingos.com/image-filters/filters"
-)
+import "dougdomingos.com/image-filters/filters/types"
 
-var GrayscaleAction = filters.Action{
-	Preprocess: nil,
-	Filter:     Grayscale,
-}
+var GrayscaleFilter = types.NewFilter(nil, Grayscale)

@@ -7,9 +7,6 @@
 // (represented by sigma, or "σ").
 package gaussian_blur
 
-import "dougdomingos.com/image-filters/filters"
+import "dougdomingos.com/image-filters/filters/types"
 
-var GaussianBlurAction = filters.Action{
-	Preprocess: nil,
-	Filter:     GaussianBlur,
-}
+var GaussianBlurFilter = types.NewFilter(nil, GaussianBlur)

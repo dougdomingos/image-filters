@@ -18,9 +18,13 @@ const (
 	// filter specified by the user.
 	FilterNotFoundError = 4
 
+	// MalformedPipelineError declares the exit code for invalid pipelines
+	// states during execution.
+	MalformedPipelineError = 5
+
 	// OutputDirError declares the exit code for failures when checking the
 	// existence of the specified output directory or creating it if needed.
-	OutputDirError = 5
+	OutputDirError = 6
 )
 
 // terminateWithError prints the error and exits the program with the given code.

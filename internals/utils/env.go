@@ -2,15 +2,21 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
-func GetEnvVar(key string) (string, error) {
-	value, isDeclared := os.LookupEnv(key)
-
-	if !isDeclared {
-		return "", fmt.Errorf("[ERROR] Required environment variable \"%s\" is not declared", key)
+// EnsureRequiredEnvVars verifies if the variables specified through the
+// input slice are declared in the environment. If any variable is not
+// declared, returns an error indicating the missing variable.
+func EnsureRequiredEnvVars(keys []string) error {
+	for _, key := range keys {
+		if value, isDeclared := os.LookupEnv(key); !isDeclared {
+			return fmt.Errorf("missing required environment variable: %s", key)
+		} else {
+			log.Printf("[ENV] %s: %s", key, value)
+		}
 	}
 
-	return value, nil
+	return nil
 }

@@ -32,7 +32,7 @@ var (
 // the serial execution multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteSerial(b *testing.B) {
 	os.Setenv("MAX_WORKERS_PER_REQUEST", "1")
-	recipe, err := pipelines.BuildRecipe(strings.Split(*filterName, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(*filterName, ","))
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
@@ -41,7 +41,7 @@ func BenchmarkExecuteSerial(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		img := generateDummyImage(*imageSize)
-		engines.ProcessRecipe(img, &recipe)
+		engines.ProcessPipeline(img, &pipeline)
 		sinkPixel = img.Pix[0]
 	}
 }
@@ -52,7 +52,7 @@ func BenchmarkExecuteSerial(b *testing.B) {
 // multiple times, reporting time and allocation statistics.
 func BenchmarkExecuteConcurrent(b *testing.B) {
 	os.Unsetenv("MAX_WORKERS_PER_REQUEST")
-	recipe, err := pipelines.BuildRecipe(strings.Split(*filterName, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(*filterName, ","))
 	if err != nil {
 		b.Fatalf("Unknown filter: %s", *filterName)
 	}
@@ -61,7 +61,7 @@ func BenchmarkExecuteConcurrent(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		img := generateDummyImage(*imageSize)
-		engines.ProcessRecipe(img, &recipe)
+		engines.ProcessPipeline(img, &pipeline)
 		sinkPixel = img.Pix[0]
 	}
 }

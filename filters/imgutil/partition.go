@@ -3,10 +3,9 @@ package imgutil
 import (
 	"image"
 	"math"
+	"os"
 	"runtime"
 	"strconv"
-
-	"dougdomingos.com/image-filters/internals/utils"
 )
 
 // GetVerticalPartitions splits an image's bounds into an arbitrary number of
@@ -49,8 +48,8 @@ func GetHorizontalPartitions(bounds image.Rectangle, segments int) []image.Recta
 func GetNumberOfWorkers(bounds image.Rectangle) int {
 	maxWorkers := runtime.NumCPU()
 
-	envVar, err := utils.GetEnvVar("MAX_WORKERS_PER_REQUEST")
-	if err == nil && envVar != "" {
+	envVar, isDeclared := os.LookupEnv("MAX_WORKERS_PER_REQUEST")
+	if isDeclared && envVar != "" {
 		if envWorkersVal, err := strconv.Atoi(envVar); err == nil {
 			maxWorkers = envWorkersVal
 		}

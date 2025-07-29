@@ -1,11 +1,11 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"image"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,7 +25,9 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	engines.ProcessRecipe(rgbaImage, &requestData.Recipe)
+	if err := engines.ProcessPipeline(rgbaImage, &requestData.Pipeline); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	outputDir := os.Getenv("API_OUTPUT_DIR")
 	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, time.Now().Format("20060102_150405"))
@@ -35,19 +37,14 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := dto.BuildProcessorResponse(outputFilename)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+	sendJSONResponse(w, response, statusCode)
 }
 
 // parseProcessorRequest extracts and validates the required parameters from the
 // HTTP request intended for the processor service. It enforces constraints on
 // request size (max. 15 MB), required fields, and image format.
 func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, string) {
-	err := r.ParseMultipartForm(15 << 20)
+	err := r.ParseMultipartForm(getRequestMaxSize())
 	if err != nil {
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
@@ -55,7 +52,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		}
 		return nil, http.StatusBadRequest, "Malformed multipart/form-data request"
 	}
-	
+
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		return nil, http.StatusBadRequest, "No image provided"
@@ -67,7 +64,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"filters\" is required"
 	}
 
-	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
+	pipeline, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}
@@ -81,6 +78,19 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		Img:         img,
 		ImgFormat:   format,
 		ImgFilename: header.Filename,
-		Recipe:      recipe,
+		Pipeline:    pipeline,
 	}, http.StatusOK, ""
+}
+
+// getRequestMaxSize returns the maximum accepted size for processor requests
+// (in bytes). It reads the MAX_REQUEST_SIZE environment variable and defaults
+// to 10 MB if the variable has an invalid value.
+func getRequestMaxSize() int64 {
+	maxSizeInMB, err := strconv.Atoi(os.Getenv("MAX_REQUEST_SIZE"))
+	if err != nil {
+		maxSizeInMB = 10
+	}
+
+	maxSizeInBytes := maxSizeInMB << 20
+	return int64(maxSizeInBytes)
 }

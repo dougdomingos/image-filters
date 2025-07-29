@@ -16,8 +16,9 @@ import (
 func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/process", services.ProcessorHandler)
 	mux.HandleFunc("/bench", services.BenchmarkHandler)
+	mux.HandleFunc("/filters", services.ListFilterHandler)
+	mux.HandleFunc("/filters/process", services.ProcessorHandler)
 	mux.HandleFunc("/images/", createFileHandler(os.Getenv("API_OUTPUT_DIR"), "/images/"))
 
 	return mux
@@ -49,6 +50,8 @@ func withRequestLogger(next http.Handler) http.Handler {
 	})
 }
 
+// createFileHandler creates a http.HandlerFunc specialized on serving requests
+// to images within the specified output directory.
 func createFileHandler(outputDir string, prefix string) http.HandlerFunc {
 	fs := http.FileServer(http.Dir(outputDir))
 

@@ -1,17 +1,30 @@
 package engines
 
 import (
+	"fmt"
 	"image"
 
 	"dougdomingos.com/image-filters/pipelines"
 )
 
-func ProcessRecipe(img *image.RGBA, recipe *pipelines.Recipe) {
-	for step := recipe.Head; step != nil; step = recipe.NextStep() {
-		if step.Action.Preprocess != nil {
-			step.Action.Preprocess(img)
+// ProcessPipeline sequentially applies all filters defined in the given
+// pipeline to the provided image.
+//
+// If the provided pipeline is nil, empty or contains a PipelineStep with a nil
+// Filter, processing stops and an error is returned. Otherwise, returns nil.
+func ProcessPipeline(img *image.RGBA, pipeline *pipelines.Pipeline) error {
+	if pipeline == nil || pipeline.IsEmpty() {
+		return fmt.Errorf("[ERROR] unable to process empty pipeline")
+	}
+
+	for !pipeline.IsEmpty() {
+		currentStep := pipeline.NextStep()
+		if currentStep.Filter == nil {
+			return fmt.Errorf("[ERROR] pipeline step has no filter")
 		}
 
-		step.Action.Filter(img)
+		currentStep.Filter.ApplyFilter(img)
 	}
+
+	return nil
 }

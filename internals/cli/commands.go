@@ -2,31 +2,25 @@ package cli
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
 	"dougdomingos.com/image-filters/engines"
+	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/internals/utils"
 	"dougdomingos.com/image-filters/pipelines"
 )
 
 // ListAvaliablePipelines displays the list of all avaliable pipelines.
 func ListAvaliablePipelines() {
-	pipelineIDs := make([]string, 0, len(pipelines.AvaliableFilters))
-
-	for filterKey := range pipelines.AvaliableFilters {
-		pipelineIDs = append(pipelineIDs, filterKey)
-	}
-
-	sort.Strings(pipelineIDs)
+	filterIDs := filters.GetAvaliableFilterIDs()
 
 	fmt.Println("Avaliable pipelines:")
-	for _, pipeline := range pipelineIDs {
+	for _, pipeline := range filterIDs {
 		fmt.Printf("\t => %s\n", pipeline)
 	}
 }
 
-func ApplyRecipeToImage(imgPath, outputDir string, filters []string) {
+func ApplyPipelineToImage(imgPath, outputDir string, filters []string) {
 	imageRGBA, format, err := utils.LoadImage(imgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)
@@ -37,12 +31,14 @@ func ApplyRecipeToImage(imgPath, outputDir string, filters []string) {
 		terminateWithError(err, OutputDirError)
 	}
 
-	recipe, err := pipelines.BuildRecipe(filters)
+	pipeline, err := pipelines.NewPipeline(filters)
 	if err != nil {
 		terminateWithError(err, FilterNotFoundError)
 	}
 
-	engines.ProcessRecipe(imageRGBA, &recipe)
+	if err := engines.ProcessPipeline(imageRGBA, &pipeline); err != nil {
+		terminateWithError(err, MalformedPipelineError)
+	}
 
 	outputFile := utils.GetProcessedImageFilename(imgPath, time.Now().String())
 	outputPath, err := utils.SaveImage(imageRGBA, format, outputDir, outputFile)

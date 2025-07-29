@@ -4,9 +4,11 @@
 // effectively mirroring the image along its horizontal axis.
 package vertical_flip
 
-import "dougdomingos.com/image-filters/filters"
+import (
+	"dougdomingos.com/image-filters/filters/types"
+)
 
-var VerticalFlipAction = filters.Action{
+var VerticalFlipAction = types.Action{
 	Preprocess: nil,
 	Filter:     VerticalFlip,
 }

@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"dougdomingos.com/image-filters/engines"
+	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/internals/utils"
 	"dougdomingos.com/image-filters/pipelines"
 )
 
 // ListAvaliablePipelines displays the list of all avaliable pipelines.
 func ListAvaliablePipelines() {
-	pipelineIDs := make([]string, 0, len(pipelines.AvaliableFilters))
+	pipelineIDs := make([]string, 0, len(filters.AvaliableFilters))
 
-	for filterKey := range pipelines.AvaliableFilters {
+	for filterKey := range filters.AvaliableFilters {
 		pipelineIDs = append(pipelineIDs, filterKey)
 	}
 

@@ -10,11 +10,11 @@
 package binarization
 
 import (
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/filters/grayscale"
+	"dougdomingos.com/image-filters/filters/types"
 )
 
-var BinarizationAction = filters.Action{
+var BinarizationAction = types.Action{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Binarization,
 }

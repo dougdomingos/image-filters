@@ -8,16 +8,16 @@
 package sobel
 
 import (
-	"dougdomingos.com/image-filters/filters"
 	"dougdomingos.com/image-filters/filters/grayscale"
+	"dougdomingos.com/image-filters/filters/types"
 )
 
-var SobelAction = filters.Action{
+var SobelAction = types.Action{
 	Preprocess: nil,
 	Filter:     Sobel,
 }
 
-var SobelGrayscaledAction = filters.Action{
+var SobelGrayscaledAction = types.Action{
 	Preprocess: grayscale.Grayscale,
 	Filter:     Sobel,
 }

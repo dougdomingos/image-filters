@@ -6,12 +6,13 @@ import (
 	"dougdomingos.com/image-filters/pipelines"
 )
 
-func ProcessRecipe(img *image.RGBA, recipe *pipelines.Recipe) {
-	for step := recipe.Head; step != nil; step = recipe.NextStep() {
-		if step.Action.Preprocess != nil {
-			step.Action.Preprocess(img)
-		}
+func ProcessPipeline(img *image.RGBA, pipeline *pipelines.Pipeline) {
+	if pipeline.IsEmpty() {
+		return
+	}
 
-		step.Action.Filter(img)
+	currentStep := pipeline.Peek()
+	for !pipeline.IsEmpty() {
+		currentStep.Filter.ApplyFilter(img)
 	}
 }

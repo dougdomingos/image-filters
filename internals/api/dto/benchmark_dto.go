@@ -12,7 +12,7 @@ import (
 type BenchmarkRequestDTO struct {
 
 	// Recipe represents the list of filters to be applied to the dummy image.
-	Recipe pipelines.Recipe
+	Recipe pipelines.Pipeline
 
 	// TestImageSize is the requested dimensions for the dummy image to be used
 	// on the benchmark tests.

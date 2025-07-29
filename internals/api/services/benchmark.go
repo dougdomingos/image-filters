@@ -47,7 +47,7 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"sample-size\" must be numeric"
 	}
 
-	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
+	recipe, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, fmt.Sprintf("Requested filter \"%s\" does not exist", filters)
 	}
@@ -60,9 +60,9 @@ func parseBenchmarkRequest(r *http.Request) (*dto.BenchmarkRequestDTO, int, stri
 
 // benchmarkRecipe determines the total time spent on a recipe execution,
 // returning the result time in milliseconds.
-func benchmarkRecipe(recipe pipelines.Recipe, img image.RGBA) int64 {
+func benchmarkRecipe(recipe pipelines.Pipeline, img image.RGBA) int64 {
 	start := time.Now()
-	engines.ProcessRecipe(&img, &recipe)
+	engines.ProcessPipeline(&img, &recipe)
 	duration := time.Since(start)
 
 	return duration.Milliseconds()

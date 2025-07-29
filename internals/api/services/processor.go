@@ -25,7 +25,7 @@ func ProcessorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rgbaImage := convertImageToRGBA(requestData.Img)
-	engines.ProcessRecipe(rgbaImage, &requestData.Recipe)
+	engines.ProcessPipeline(rgbaImage, &requestData.Recipe)
 
 	outputDir := os.Getenv("API_OUTPUT_DIR")
 	outputFilename := utils.GetProcessedImageFilename(requestData.ImgFilename, time.Now().Format("20060102_150405"))
@@ -50,7 +50,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		}
 		return nil, http.StatusBadRequest, "Malformed multipart/form-data request"
 	}
-	
+
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		return nil, http.StatusBadRequest, "No image provided"
@@ -62,7 +62,7 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		return nil, http.StatusBadRequest, "Parameter \"filters\" is required"
 	}
 
-	recipe, err := pipelines.BuildRecipe(strings.Split(filters, ","))
+	recipe, err := pipelines.NewPipeline(strings.Split(filters, ","))
 	if err != nil {
 		return nil, http.StatusNotFound, "Requested filter does not exist"
 	}
@@ -79,7 +79,6 @@ func parseProcessorRequest(r *http.Request) (*dto.ProcessorRequestDTO, int, stri
 		Recipe:      recipe,
 	}, http.StatusOK, ""
 }
-
 
 // getRequestMaxSize returns the maximum accepted size for processor requests
 // (in bytes). It reads the MAX_REQUEST_SIZE environment variable and defaults

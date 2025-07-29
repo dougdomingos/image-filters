@@ -21,7 +21,7 @@ type ProcessorRequestDTO struct {
 	ImgFilename string
 
 	// Recipe represents the list of filters to be applied to the image.
-	Recipe pipelines.Recipe
+	Recipe pipelines.Pipeline
 }
 
 // ProcessorResponseDTO represents the JSON for processor HTTP responses.

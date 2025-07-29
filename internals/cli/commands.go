@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
 	"dougdomingos.com/image-filters/engines"
@@ -13,16 +12,10 @@ import (
 
 // ListAvaliablePipelines displays the list of all avaliable pipelines.
 func ListAvaliablePipelines() {
-	pipelineIDs := make([]string, 0, len(filters.AvaliableFilters))
-
-	for filterKey := range filters.AvaliableFilters {
-		pipelineIDs = append(pipelineIDs, filterKey)
-	}
-
-	sort.Strings(pipelineIDs)
+	filterIDs := filters.GetAvaliableFilterIDs()
 
 	fmt.Println("Avaliable pipelines:")
-	for _, pipeline := range pipelineIDs {
+	for _, pipeline := range filterIDs {
 		fmt.Printf("\t => %s\n", pipeline)
 	}
 }

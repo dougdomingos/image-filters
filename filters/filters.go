@@ -24,7 +24,7 @@ var AvaliableFilters = map[string]types.Filter{
 	"sobel-grayscaled": sobel.SobelGrayscaledFilter,
 	"vertical-flip":    vertical_flip.VerticalFlipFilter,
 	"gaussian-blur":    gaussian_blur.GaussianBlurFilter,
-	// add more actions here...
+	// add more filters here...
 }
 
 // GetFilter retrieves a filter by its name from the AvailableFilters map.
@@ -37,4 +37,16 @@ func GetFilter(filterID string) (types.Filter, error) {
 	}
 
 	return pipeline, nil
+}
+
+// GetAvaliableFilterIDs returns a slice containing the identifiers of all
+// filters declared in the AvaliableFilters map.
+func GetAvaliableFilterIDs() []string {
+	filterIDs := make([]string, 0, len(AvaliableFilters))
+
+	for filterKey := range AvaliableFilters {
+		filterIDs = append(filterIDs, filterKey)
+	}
+
+	return filterIDs
 }

@@ -16,8 +16,9 @@ import (
 func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/process", services.ProcessorHandler)
 	mux.HandleFunc("/bench", services.BenchmarkHandler)
+	mux.HandleFunc("/filters", services.ListFilterHandler)
+	mux.HandleFunc("/filters/process", services.ProcessorHandler)
 	mux.HandleFunc("/images/", createFileHandler(os.Getenv("API_OUTPUT_DIR"), "/images/"))
 
 	return mux

@@ -22,10 +22,9 @@ func BenchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dummyImg := image.NewRGBA(image.Rect(0, 0, requestData.TestImageSize, requestData.TestImageSize))
-	serialRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
-	concurrentRuntime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
+	execTime := benchmarkPipeline(requestData.Pipeline, *dummyImg)
 
-	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, serialRuntime, concurrentRuntime)
+	response := dto.BuildBenchmarkResponse(requestData.TestImageSize, execTime)
 	sendJSONResponse(w, response, statusCode)
 }
 

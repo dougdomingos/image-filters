@@ -26,21 +26,17 @@ type BenchmarkResponseDTO struct {
 	// provided dimensions of the test image.
 	TestImageSize string `json:"testImageSize"`
 
-	// SerialRuntime is the measured execution time for serial mode.
-	SerialRuntime int64 `json:"serialRuntime"`
-
-	// ConcurrentRuntime is the measured execution time for concurrent mode.
-	ConcurrentRuntime int64 `json:"concurrentRuntime"`
+	// ExecTime is the measured execution time for the specified pipeline.
+	ExecTime int64 `json:"execTime"`
 }
 
 // BuildBenchmarkResponse constructs a BenchmarkResponseDTO with image size
 // formatted to two decimals and runtime metrics in milliseconds.
-func BuildBenchmarkResponse(imgDimension int, serialTime, concurrentTime int64) BenchmarkResponseDTO {
+func BuildBenchmarkResponse(imgDimension int, execTime int64) BenchmarkResponseDTO {
 	testImageSize := (math.Pow(float64(imgDimension), 2) * 4) / 1_000_000
 
 	return BenchmarkResponseDTO{
-		TestImageSize:     fmt.Sprintf("%.2f MB", testImageSize),
-		SerialRuntime:     serialTime,
-		ConcurrentRuntime: concurrentTime,
+		TestImageSize: fmt.Sprintf("%.2f MB", testImageSize),
+		ExecTime:      execTime,
 	}
 }

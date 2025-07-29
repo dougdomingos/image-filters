@@ -37,7 +37,7 @@ func ApplyPipelineToImage(imgPath, outputDir string, filters []string) {
 	}
 
 	if err := engines.ProcessPipeline(imageRGBA, &pipeline); err != nil {
-		terminateWithError(err, FilterNotFoundError)
+		terminateWithError(err, MalformedPipelineError)
 	}
 
 	outputFile := utils.GetProcessedImageFilename(imgPath, time.Now().String())

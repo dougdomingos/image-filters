@@ -8,7 +8,4 @@ package grayscale
 
 import "dougdomingos.com/image-filters/filters/types"
 
-var GrayscaleAction = types.Action{
-	Preprocess: nil,
-	Filter:     Grayscale,
-}
+var GrayscaleFilter = types.NewFilter(nil, Grayscale)

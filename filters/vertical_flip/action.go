@@ -8,7 +8,4 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
-var VerticalFlipAction = types.Action{
-	Preprocess: nil,
-	Filter:     VerticalFlip,
-}
+var VerticalFlipFilter = types.NewFilter(nil, VerticalFlip)

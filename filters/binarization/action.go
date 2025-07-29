@@ -14,7 +14,4 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
-var BinarizationAction = types.Action{
-	Preprocess: grayscale.Grayscale,
-	Filter:     Binarization,
-}
+var BinarizationFilter = types.NewFilter(grayscale.Grayscale, Binarization)

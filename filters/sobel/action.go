@@ -12,12 +12,5 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
-var SobelAction = types.Action{
-	Preprocess: nil,
-	Filter:     Sobel,
-}
-
-var SobelGrayscaledAction = types.Action{
-	Preprocess: grayscale.Grayscale,
-	Filter:     Sobel,
-}
+var SobelFilter = types.NewFilter(nil, Sobel)
+var SobelGrayscaledFilter = types.NewFilter(grayscale.Grayscale, Sobel)

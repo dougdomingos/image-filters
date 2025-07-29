@@ -9,7 +9,4 @@ package gaussian_blur
 
 import "dougdomingos.com/image-filters/filters/types"
 
-var GaussianBlurAction = types.Action{
-	Preprocess: nil,
-	Filter:     GaussianBlur,
-}
+var GaussianBlurFilter = types.NewFilter(nil, GaussianBlur)

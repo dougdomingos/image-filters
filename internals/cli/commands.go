@@ -20,7 +20,7 @@ func ListAvaliablePipelines() {
 	}
 }
 
-func ApplyRecipeToImage(imgPath, outputDir string, filters []string) {
+func ApplyPipelineToImage(imgPath, outputDir string, filters []string) {
 	imageRGBA, format, err := utils.LoadImage(imgPath)
 	if err != nil {
 		terminateWithError(err, ImageLoadingError)

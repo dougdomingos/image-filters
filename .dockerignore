@@ -1,0 +1,25 @@
+# Test-related files
+**/*_test.go
+
+# Environment variables (should be passed through --env-file flag)
+.env
+
+# Auto-generated and doc-related files
+output/
+README.md
+
+# OS/editor metadata
+.DS_Store
+.vscode/
+*.swp
+*.swo
+*.bak
+
+# Version control
+.git
+.gitignore
+
+# Build artifacts
+*.out
+*.exe
+*.log

@@ -22,6 +22,10 @@ func StartHTTPServer() {
 		log.Fatal(err)
 	}
 
+	if err := utils.CreateOutputDir(os.Getenv("API_OUTPUT_DIR")); err != nil {
+		log.Fatal(err)
+	}
+
 	log.Printf("Starting HTTP server on port %d\n", port)
 	if err := http.ListenAndServe(address, router); err != nil {
 		log.Fatalf("Could not start HTTP server: %s\n", err.Error())

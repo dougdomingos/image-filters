@@ -1,8 +1,10 @@
 # Test-related files
 **/*_test.go
 
-# Environment variables (should be passed through --env-file flag)
+# Makefile and dotenv files
+Makefile
 .env
+.env.sample
 
 # Auto-generated and doc-related files
 output/

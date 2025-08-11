@@ -14,7 +14,7 @@ func HorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
-		imageStrips = imgutil.GetHorizontalPartitions(bounds, numWorkers)
+		imageStrips = imgutil.GetHorizontalSegments(bounds, numWorkers)
 		wg          sync.WaitGroup
 	)
 

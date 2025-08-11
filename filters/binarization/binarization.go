@@ -14,7 +14,7 @@ func Binarization(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
-		imageStrips = imgutil.GetVerticalPartitions(bounds, numWorkers)
+		imageStrips = imgutil.GetVerticalSegments(bounds, numWorkers)
 		threshold   = otsuThreshold(img, bounds)
 		wg          sync.WaitGroup
 	)

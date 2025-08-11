@@ -14,7 +14,7 @@ func GaussianBlur(img *image.RGBA) {
 	var (
 		bounds                       = img.Bounds()
 		numWorkers                   = imgutil.GetNumberOfWorkers(bounds)
-		imageStrips                  = imgutil.GetVerticalPartitions(bounds, numWorkers)
+		imageStrips                  = imgutil.GetVerticalSegments(bounds, numWorkers)
 		sigma                        = computeKernelSigma(kernelSize)
 		gaussianKernel, kernelOffset = generateGaussianKernel(kernelSize, sigma)
 		paddedCopy                   = imgutil.CreatePaddedCopy(*img, kernelOffset)

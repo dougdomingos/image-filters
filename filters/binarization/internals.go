@@ -9,10 +9,10 @@ import (
 
 var (
 	// blackPixel represents a fully opaque black pixel in RGBA format
-	blackPixel = []uint8{0, 0, 0, 255}
+	blackPixel = [4]uint8{0, 0, 0, 255}
 
 	// whitePixel represents a fully opaque white pixel in RGBA format
-	whitePixel = []uint8{255, 255, 255, 255}
+	whitePixel = [4]uint8{255, 255, 255, 255}
 )
 
 // otsuThreshold computes the optimal global threshold for binarization

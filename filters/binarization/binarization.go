@@ -35,15 +35,13 @@ func binarizationWorker(img *image.RGBA, bounds image.Rectangle, threshold uint8
 	defer wg.Done()
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		rowStart := (y - img.Rect.Min.Y) * img.Stride
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			offset := rowStart + (x-img.Rect.Min.X)*4
 			intensity, _, _, _ := imgutil.GetRGBA8(img, x, y)
 
 			if intensity > threshold {
-				copy(img.Pix[offset:offset+4], whitePixel[:])
+				imgutil.WriteToPixel(img, x, y, whitePixel)
 			} else {
-				copy(img.Pix[offset:offset+4], blackPixel[:])
+				imgutil.WriteToPixel(img, x, y, blackPixel)
 			}
 
 		}

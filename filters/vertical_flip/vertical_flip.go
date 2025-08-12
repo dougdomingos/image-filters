@@ -32,15 +32,12 @@ func verticalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGr
 	defer wg.Done()
 	middle := (bounds.Max.Y - bounds.Min.Y) / 2
 
-	for deltaY := range middle {
-		rowStartTop := (bounds.Min.Y + deltaY) * img.Stride
-		rowStartBottom := (bounds.Max.Y - 1 - deltaY) * img.Stride
-
+	for y := range middle {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			topOffset := rowStartTop + (x * 4)
-			bottomOffset := rowStartBottom + (x * 4)
+			topHead := bounds.Min.Y + y
+			bottomHead := bounds.Max.Y - y - 1
 
-			imgutil.SwapPixels(img, topOffset, bottomOffset)
+			imgutil.SwapPixels(img, x, topHead, x, bottomHead)
 		}
 	}
 }

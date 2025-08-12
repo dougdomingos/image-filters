@@ -33,13 +33,11 @@ func horizontalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.Wait
 	middle := (bounds.Max.X - bounds.Min.X) / 2
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		rowStart := y * img.Stride
+		for x := range middle {
+			leftHead := bounds.Min.X + x
+			rightHead := bounds.Max.X - x - 1
 
-		for deltaX := range middle {
-			leftOffset := rowStart + (bounds.Min.X+deltaX)*4
-			rightOffset := rowStart + (bounds.Max.X-1-deltaX)*4
-
-			imgutil.SwapPixels(img, leftOffset, rightOffset)
+			imgutil.SwapPixels(img, leftHead, y, rightHead, y)
 		}
 	}
 }

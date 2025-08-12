@@ -24,11 +24,14 @@ func WriteToPixel(img *image.RGBA, x, y int, pixel [4]uint8) {
 	copy(img.Pix[offset:offset+4], pixel[:])
 }
 
-// SwapPixels swaps two pixels' positions within a RGBA image. It's based on
-// Go's RGBA implementation, in which pixels channels are disposed as a
-// unidimensional array of unsigned 8-bit integers.
-func SwapPixels(img *image.RGBA, offsetX, offsetY int) {
+// SwapPixels exchanges the RGBA values of the pixels at (x1, y1) and (x2, y2)
+// in the specified image. The caller must ensure the coordinates are within
+// the bounds of the provided image.
+func SwapPixels(img *image.RGBA, x1, y1, x2, y2 int) {
+	offset1 := img.PixOffset(x1, y1)
+	offset2 := img.PixOffset(x2, y2)
+
 	for i := range 4 {
-		img.Pix[offsetX+i], img.Pix[offsetY+i] = img.Pix[offsetY+i], img.Pix[offsetX+i]
+		img.Pix[offset1+i], img.Pix[offset2+i] = img.Pix[offset2+i], img.Pix[offset1+i]
 	}
 }

@@ -5,14 +5,14 @@ import "image"
 // GetRGBA8 extracts the channel values from a specific pixel within an image
 // and returns them as 8-bit unsigned integers, ranging from 0 to 255.
 func GetRGBA8(img *image.RGBA, x, y int) (r, g, b, a uint8) {
-	red, green, blue, alpha := img.At(x, y).RGBA()
+	offset := img.PixOffset(x, y)
 
-	red8 := uint8(red >> 8)
-	green8 := uint8(green >> 8)
-	blue8 := uint8(blue >> 8)
-	alpha8 := uint8(alpha >> 8)
+	red := img.Pix[offset]
+	green := img.Pix[offset+1]
+	blue := img.Pix[offset+2]
+	alpha := img.Pix[offset+3]
 
-	return red8, green8, blue8, alpha8
+	return red, green, blue, alpha
 }
 
 // SwapPixels swaps two pixels' positions within a RGBA image. It's based on

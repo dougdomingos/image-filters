@@ -1,11 +1,24 @@
+// Package binarization implements the binarization filter.
+//
+// The binarization filter converts an image to black and white based on a
+// brightness threshold, which can either be fixed or calculated based on the
+// image's pixels.
+//
+// This implementation applies Otsu's Method of thresholding to determine the
+// value that best separates the foreground and background components of the
+// image.
 package binarization
 
 import (
 	"image"
 	"sync"
 
+	"dougdomingos.com/image-filters/filters/grayscale"
 	"dougdomingos.com/image-filters/filters/imgutil"
+	"dougdomingos.com/image-filters/filters/types"
 )
+
+var BinarizationFilter = types.NewFilter(grayscale.Grayscale, Binarization)
 
 // Binarization applies the binarization filter to the entire image
 // using multiple goroutines. It first computes Otsu's global threshold,

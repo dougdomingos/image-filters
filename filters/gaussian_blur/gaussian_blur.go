@@ -1,3 +1,10 @@
+// Pacakge gaussian_blur implements the gaussian blur filter.
+//
+// The Gaussian blur filter applies a smoothing effect to an image by averaging
+// neighboring pixels with a Gaussian function, which reduces image noise and
+// detail. The kernel used in color calculations is automatically generated
+// based on a predefined kernel size and standard deviation of the neighbors
+// (represented by sigma, or "σ").
 package gaussian_blur
 
 import (
@@ -5,7 +12,10 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
+	"dougdomingos.com/image-filters/filters/types"
 )
+
+var GaussianBlurFilter = types.NewFilter(nil, GaussianBlur)
 
 // GaussianBlur applies the gaussian blur filter to the entire image
 // using multiple goroutines. It computes the global gaussian kernel to be used

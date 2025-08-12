@@ -1,3 +1,7 @@
+// Package vertical_flip implements the vertical flip filter.
+//
+// The vertical flip filter reverses the order of pixels in each column,
+// effectively mirroring the image along its horizontal axis.
 package vertical_flip
 
 import (
@@ -5,7 +9,10 @@ import (
 	"sync"
 
 	"dougdomingos.com/image-filters/filters/imgutil"
+	"dougdomingos.com/image-filters/filters/types"
 )
+
+var VerticalFlipFilter = types.NewFilter(nil, VerticalFlip)
 
 // VerticalFlip applies the vertical flip filter to the entire image
 // using multiple goroutines. The image is divided into vertical strips to

@@ -40,11 +40,7 @@ func sobelWorker(srcImg, paddedCopy *image.RGBA, bounds image.Rectangle, mainWg 
 	paddedMaxY := bounds.Max.Y + copyPadding
 
 	for y := paddedMinY; y < paddedMaxY; y++ {
-		srcRow := (y - copyPadding) * srcImg.Stride
-
 		for x := paddedMinX; x < paddedMaxX; x++ {
-			srcCol := srcRow + (x-copyPadding)*4
-
 			var r8, g8, b8, a8 uint8
 			var gxR, gxG, gxB, gyR, gyG, gyB int
 
@@ -75,7 +71,8 @@ func sobelWorker(srcImg, paddedCopy *image.RGBA, bounds image.Rectangle, mainWg 
 			gradG := clampColorValue(math.Sqrt(float64(gxG*gxG + gyG*gyG)))
 			gradB := clampColorValue(math.Sqrt(float64(gxB*gxB + gyB*gyB)))
 
-			copy(srcImg.Pix[srcCol:srcCol+4], []uint8{gradR, gradG, gradB, a8})
+			updatedPixel := [4]uint8{gradR, gradG, gradB, a8}
+			imgutil.WriteToPixel(srcImg, x-copyPadding, y-copyPadding, updatedPixel)
 		}
 	}
 }

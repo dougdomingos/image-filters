@@ -42,11 +42,8 @@ func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, ker
 	paddedMaxY := bounds.Max.Y + kernelOffset
 
 	for y := paddedMinY; y < paddedMaxY; y++ {
-		srcRow := (y - kernelOffset) * img.Stride
-
 		for x := paddedMinX; x < paddedMaxX; x++ {
 			var sumR, sumG, sumB, sumA, kernelWeightSum float64
-			srcCol := srcRow + (x-kernelOffset)*4
 
 			for ky := -kernelOffset; ky <= kernelOffset; ky++ {
 				for kx := -kernelOffset; kx <= kernelOffset; kx++ {
@@ -76,8 +73,8 @@ func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, ker
 				sumA /= kernelWeightSum
 			}
 
-			updatedColor := []uint8{clamp256(sumR), clamp256(sumG), clamp256(sumB), clamp256(sumA)}
-			copy(img.Pix[srcCol:srcCol+4], updatedColor)
+			updatedColor := [4]uint8{clamp256(sumR), clamp256(sumG), clamp256(sumB), clamp256(sumA)}
+			imgutil.WriteToPixel(img, x-kernelOffset, y-kernelOffset, updatedColor)
 		}
 	}
 }

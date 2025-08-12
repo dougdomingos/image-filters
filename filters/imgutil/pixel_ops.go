@@ -15,6 +15,15 @@ func GetRGBA8(img *image.RGBA, x, y int) (r, g, b, a uint8) {
 	return red, green, blue, alpha
 }
 
+// WriteToPixel sets the pixel at (x, y) in the image to the specified RGBA
+// values. The pixel array must contain red, green, blue, and alpha components
+// in that order. The caller must ensure (x, y) is within the bounds of the
+// provided image.
+func WriteToPixel(img *image.RGBA, x, y int, pixel [4]uint8) {
+	offset := img.PixOffset(x, y)
+	copy(img.Pix[offset:offset+4], pixel[:])
+}
+
 // SwapPixels swaps two pixels' positions within a RGBA image. It's based on
 // Go's RGBA implementation, in which pixels channels are disposed as a
 // unidimensional array of unsigned 8-bit integers.

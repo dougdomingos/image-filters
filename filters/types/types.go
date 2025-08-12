@@ -33,12 +33,11 @@ func (filter *Filter) ApplyFilter(img *image.RGBA) {
 }
 
 // NewFilter constructs a new Filter from the given pre-processing and main
-// processing functions. The main processing function must be non-nil.
-//
-// If 'main' is nil, the returned Filter will be a zero value (invalid).
+// processing functions. The function panics if the provided main
+// transformation is nil.
 func NewFilter(pre, main Transformation) Filter {
 	if main == nil {
-		panic("BuildFilter: 'main' processing function must not be nil")
+		panic("main transformation must not be nil")
 	}
 
 	return Filter{

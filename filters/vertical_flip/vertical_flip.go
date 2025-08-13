@@ -1,7 +1,5 @@
-// Package vertical_flip implements the vertical flip filter.
-//
-// The vertical flip filter reverses the order of pixels in each column,
-// effectively mirroring the image along its horizontal axis.
+// Package vertical_flip implements an image filter that reverses images in
+// the vertical axis.
 package vertical_flip
 
 import (
@@ -12,11 +10,12 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// VerticalFlipFilter applies the vertical flip transformation to a image. No
+// pre-process is performed.
 var VerticalFlipFilter = types.NewFilter(nil, VerticalFlip)
 
-// VerticalFlip applies the vertical flip filter to the entire image
-// using multiple goroutines. The image is divided into vertical strips to
-// ensure the correct mirrored layout.
+// VerticalFlip applies the vertical flip filter to the entire image. The image
+// is divided into vertical segments, each delegated to a worker goroutine.
 func VerticalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -33,8 +32,8 @@ func VerticalFlip(img *image.RGBA) {
 	wg.Wait()
 }
 
-// verticalFlipWorker processes a subregion of the image by reversing the order
-// of each column within its respective boundaries.
+// verticalFlipWorker reverses the order of pixels for each column in its
+// segment.
 func verticalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
 	defer wg.Done()
 	middle := (bounds.Max.Y - bounds.Min.Y) / 2

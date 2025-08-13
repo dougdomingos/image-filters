@@ -1,7 +1,5 @@
-// Package horizontal_flip implements the horizontal flip filter.
-//
-// The horizontal flip filter reverses the order of pixels in each row,
-// effectively mirroring the image along its vertical axis.
+// Package horizontal_flip implements an image filter that reverses images in
+// the horizontal axis.
 package horizontal_flip
 
 import (
@@ -12,11 +10,13 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// HorizontalFlipFilter applies the horizontal flip transformation to a image.
+// No pre-processing is performed.
 var HorizontalFlipFilter = types.NewFilter(nil, HorizontalFlip)
 
-// HorizontalFlip applies the horizontal flip filter to the entire
-// image using multiple goroutines. The image is divided into horizontal strips
-// to ensure the correct mirrored layout.
+// HorizontalFlip applies the horizontal flip filter to the entire image. The
+// image is divided into horizontal segments, each delegated to a worker
+// goroutine.
 func HorizontalFlip(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -33,8 +33,8 @@ func HorizontalFlip(img *image.RGBA) {
 	wg.Wait()
 }
 
-// horizontalFlipWorker processes a subregion of the image by reversing the
-// order of each row within its respective boundaries.
+// horizontalFlipWorker reverses the order of pixels for each row in its
+// segment.
 func horizontalFlipWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
 	defer wg.Done()
 	middle := (bounds.Max.X - bounds.Min.X) / 2

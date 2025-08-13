@@ -1,9 +1,9 @@
-// Package grayscale implements the grayscale filter.
+// Package grayscale implements an image filter that converts colored images
+// to grayscale, based on perceived brightness of the colors of each pixel. 
 //
-// The grayscale filter converts each pixel of an image into its equivalent
-// shade of gray, based on a transform function. This implementation uses the
-// Rec. 601 luma transform to compute the grayscale value of each color channel.
-// The alpha channel is left unmodified.
+// This implementation uses the Rec. 601 luma transform, which weights color
+// channels according to human brightness perception, producing more natural
+// results. The alpha channel remains unchanged.
 package grayscale
 
 import (
@@ -14,10 +14,13 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// GrayscaleFilter applies the grayscale transformation to a image. No
+// pre-processing is performed.
 var GrayscaleFilter = types.NewFilter(nil, Grayscale)
 
-// Grayscale applies the grayscale filter to the entire image using
-// multiple goroutines to process different partitions concurrently.
+// Grayscale applies the grayscale transformation to the entire image. The
+// image is divided into vertical segments, each delegated to a worker
+// goroutine.
 func Grayscale(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -34,8 +37,8 @@ func Grayscale(img *image.RGBA) {
 	wg.Wait()
 }
 
-// grayscaleWorker processes a partition of the original image by applying the
-// grayscale filter to such partition.
+// grayscaleWorker converts all pixels in the given image segment to grayscale
+// by computing their luminance and updating them in-place.
 func grayscaleWorker(img *image.RGBA, bounds image.Rectangle, wg *sync.WaitGroup) {
 	defer wg.Done()
 

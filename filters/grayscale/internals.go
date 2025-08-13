@@ -1,13 +1,12 @@
 package grayscale
 
-// runLumaTransform computes the grayscale value of a pixel based on the Rec. 601
-// luma transform:
+// runLumaTransform computes the brightness value of a pixel based on the
+// Rec. 601 luma transform:
 //
-//	gray = (0.299 * R) + (0.587 * G) + (0.114 * B)
+//	brightness = (0.299 * R) + (0.587 * G) + (0.114 * B)
 //
-// The Rec. 601 standard accounts for human visual perception, assigning higher
-// weight to the green channel,followed by red and blue, based on the eye's
-// sensitivity to each color.
+// The Rec. 601 standard accounts for human perception of brightness, assigning
+// a higher weight to green, followed by red and blue.
 func runLumaTransform(r, g, b uint8) uint8 {
 	weightedRed := 0.299 * float64(r)
 	weightedGreen := 0.587 * float64(g)

@@ -1,12 +1,16 @@
-// Package binarization implements the binarization filter.
+// Package binarization implements an image filter that classifies each pixel
+// as foreground or background based on a global brightness threshold. Pixels
+// whose brightness is higher than the threshold are marked as white, while
+// those below are marked as black.
 //
-// The binarization filter converts an image to black and white based on a
-// brightness threshold, which can either be fixed or calculated based on the
-// image's pixels.
+// This implementation uses Otsu's Method to compute thresholds of images, as
+// it adapts to the brightness distribution of the image and computes a
+// threshold that best separates foreground and background pixels, ensuring
+// consistent results regardless of lighting variations.
 //
-// This implementation applies Otsu's Method of thresholding to determine the
-// value that best separates the foreground and background components of the
-// image.
+// As binarization depends on pixel brightness, this implementation declares
+// the [Grayscale] filter as a pre-processing step to improve threshold
+// computations.
 package binarization
 
 import (
@@ -18,17 +22,18 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// BinarizationFilter applies a grayscale pre-process followed by the
+// binarization transformation.
 var BinarizationFilter = types.NewFilter(grayscale.Grayscale, Binarization)
 
-// Binarization applies the binarization filter to the entire image
-// using multiple goroutines. It first computes Otsu's global threshold,
-// then partitions the image and processes each partition concurrently.
+// Binarization applies the binarization transformation to the entire image. The
+// image is divided into vertical segments, each delegated to a worker goroutine.
 func Binarization(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
 		numWorkers  = imgutil.GetNumberOfWorkers(bounds)
 		imageStrips = imgutil.GetVerticalSegments(bounds, numWorkers)
-		threshold   = otsuThreshold(img, bounds)
+		threshold   = otsuThreshold(img)
 		wg          sync.WaitGroup
 	)
 
@@ -40,15 +45,14 @@ func Binarization(img *image.RGBA) {
 	wg.Wait()
 }
 
-// binarizationWorker processes a subregion of the image by applying the
-// binarization filter based on a shared global threshold. It updates each
-// pixel in the subregion to either black or white, depending on it's
-// intensity.
-func binarizationWorker(img *image.RGBA, bounds image.Rectangle, threshold uint8, wg *sync.WaitGroup) {
+// binarizationWorker processes a segment of the image based on the global
+// brightness threshold. Pixels whose brightness is above the threshold are
+// set to while, while others are set to black.
+func binarizationWorker(img *image.RGBA, segment image.Rectangle, threshold uint8, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+	for y := segment.Min.Y; y < segment.Max.Y; y++ {
+		for x := segment.Min.X; x < segment.Max.X; x++ {
 			intensity, _, _, _ := imgutil.GetRGBA8(img, x, y)
 
 			if intensity > threshold {

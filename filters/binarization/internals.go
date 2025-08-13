@@ -15,14 +15,15 @@ var (
 	whitePixel = [4]uint8{255, 255, 255, 255}
 )
 
-// otsuThreshold computes the optimal global threshold for binarization
-// based on Otsu's method. It analyzes the intensity histogram of the image
-// paritition and  returns the threshold value that maximizes the variance
-// between foreground and background component.
-func otsuThreshold(img *image.RGBA, bounds image.Rectangle) uint8 {
+// otsuThreshold computes the optimal brightness threshold for the provided
+// image. It analyzes the brightness histogram of the image and returns the
+// threshold value that maximizes the variance between foreground and
+// background components.
+func otsuThreshold(img *image.RGBA) uint8 {
 	var (
-		histogram        []uint32 = make([]uint32, 256)
-		totalPixels      uint32   = uint32(bounds.Dx() * bounds.Dy())
+		bounds           image.Rectangle = img.Bounds()
+		histogram        []uint32        = make([]uint32, 256)
+		totalPixels      uint32          = uint32(bounds.Dx() * bounds.Dy())
 		totalSum         uint64
 		sumBackground    float64
 		weightBackground float64
@@ -33,8 +34,7 @@ func otsuThreshold(img *image.RGBA, bounds image.Rectangle) uint8 {
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			gray, _, _, _ := imgutil.GetRGBA8(img, x, y)
-			intensity := gray
+			intensity, _, _, _ := imgutil.GetRGBA8(img, x, y)
 			histogram[intensity]++
 		}
 	}

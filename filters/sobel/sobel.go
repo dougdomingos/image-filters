@@ -1,10 +1,10 @@
-// Package sobel implements the sobel filter.
+// Package sobel implements an image filter that detects edges in images using
+// the Sobel operator, a common edge detection algorithm in image processing.
 //
-// The sobel filter applies Sobel's Operator for edge detection to measure the
-// existence and intensity of edges within the image. Edges are detected by
-// measuring the color variation between a pixel and its neighbors. Sobel's
-// Operator relies on two convolution kernels to detect edges in the vertical
-// and horizontal axis.
+// The Sobel operator works by applying two 3x3 convolution kernels (for
+// horizontal and vertical edges, respectively) to compute the gradient
+// magnitude of each pixel. The resulting gradient magnitude highlights regions
+// with significant brightness changes, thus highlighting edges in the image.
 package sobel
 
 import (
@@ -17,12 +17,21 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// SobelFilter applies the sobel transformation to an image. No pre-processing
+// is performed.
 var SobelFilter = types.NewFilter(nil, Sobel)
+
+// SobelGrayscaledFilter applies a grayscale pre-process, followed by the sobel
+// transformation. As the Sobel operator relies on pixel brightness, it works
+// best on grayscaled images.
 var SobelGrayscaledFilter = types.NewFilter(grayscale.Grayscale, Sobel)
 
-// Sobel applies the Sobel filter to the entire image using multiple
-// goroutines. It makes a full copy of the image, which is shared amongst the
-// routines, which then modify their respective partitions.
+// Sobel applies the sobel transformation to the entire image. The image is
+// divided into vertical segments, each delegated to a worker goroutine.
+// 
+// Each goroutine also receives a global, padded copy of the image, which
+// ensures that kernel positions are always valid and preserving original data
+// until all computations are finished.
 func Sobel(img *image.RGBA) {
 	var (
 		bounds      = img.Bounds()
@@ -40,9 +49,10 @@ func Sobel(img *image.RGBA) {
 	mainWg.Wait()
 }
 
-// sobelWorker processes a subregion of the image by applying the sobel filter
-// based on a global copy of the original image, computing the kernel values of
-// each color channel of each pixel in the subregion.
+// sobelWorker computes Sobel gradients for a segment of the image. It uses a
+// padded copy of the original to safely access neighboring pixels. The
+// gradients of each pixel are computed based on the brightness of its
+// neighbors, where greater variations lead to more intense edges.
 func sobelWorker(srcImg, paddedCopy *image.RGBA, bounds image.Rectangle, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
 

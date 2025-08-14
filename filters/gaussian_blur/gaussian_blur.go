@@ -1,10 +1,8 @@
-// Pacakge gaussian_blur implements the gaussian blur filter.
-//
-// The Gaussian blur filter applies a smoothing effect to an image by averaging
-// neighboring pixels with a Gaussian function, which reduces image noise and
-// detail. The kernel used in color calculations is automatically generated
-// based on a predefined kernel size and standard deviation of the neighbors
-// (represented by sigma, or "σ").
+// Pacakge gaussian_blur implements an image smoothing filter based on a
+// gaussian convolution kernel. It reduces noise and detail by blending each
+// pixel with its neighbors through a gaussian kernel, where closer pixels are
+// more significant. The strength of the blur effect depends on the kernel size
+// and standard deviation (σ).
 package gaussian_blur
 
 import (
@@ -15,11 +13,17 @@ import (
 	"dougdomingos.com/image-filters/filters/types"
 )
 
+// GaussianBlurFilter applies the gaussian blur transformation to an image. No
+// pre-processing is performed.
 var GaussianBlurFilter = types.NewFilter(nil, GaussianBlur)
 
-// GaussianBlur applies the gaussian blur filter to the entire image
-// using multiple goroutines. It computes the global gaussian kernel to be used
-// by all workers.
+// GaussianBlur applies the gaussian blur transformation to the entire image.
+// The image is divided into vertical segments, each delegated to a worker
+// goroutine.
+// 
+// Each goroutine also receives a global, padded copy of the image, which
+// ensures that kernel positions are always valid and preserving original data
+// until all computations are finished.
 func GaussianBlur(img *image.RGBA) {
 	var (
 		bounds                       = img.Bounds()
@@ -39,9 +43,8 @@ func GaussianBlur(img *image.RGBA) {
 	mainWg.Wait()
 }
 
-// gaussianBlurWorker process a subregion of the image by applying the gaussian
-// blur filter based on a global copy of the original image, computing the
-// weighted color values for each pixel within the partition.
+// gaussianBlurWorker applies the Gaussian kernel to a segment of the image. It
+// uses a padded copy of the original to safely access neighboring pixels.
 func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, kernel [][]float64, kernelOffset int, mainWg *sync.WaitGroup) {
 	defer mainWg.Done()
 
@@ -59,7 +62,7 @@ func gaussianBlurWorker(img, paddedCopy *image.RGBA, bounds image.Rectangle, ker
 				for kx := -kernelOffset; kx <= kernelOffset; kx++ {
 					deltaX, deltaY := x+kx, y+ky
 
-					// disconsider padding pixels from blurring calculations
+					// skip padding pixels from gradient calculations
 					if !imgutil.MapsToOriginalPixel(originalBounds, deltaX, deltaY, kernelOffset) {
 						continue
 					}

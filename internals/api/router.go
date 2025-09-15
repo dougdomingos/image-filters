@@ -50,6 +50,26 @@ func withRequestLogger(next http.Handler) http.Handler {
 	})
 }
 
+func withCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		allowOrigin := os.Getenv("CORS_ALLOW_ORIGIN")
+		if allowOrigin == "" {
+			allowOrigin = "*"
+		}
+		
+		w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // createFileHandler creates a http.HandlerFunc specialized on serving requests
 // to images within the specified output directory.
 func createFileHandler(outputDir string, prefix string) http.HandlerFunc {
